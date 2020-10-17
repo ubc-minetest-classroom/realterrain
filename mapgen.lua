@@ -141,11 +141,11 @@ end
 
 local function randomize_trees(tree)
     trees = {} -- "treename", number of schems
-    trees["acacia"]     = 2
+    trees["acacia"]     = 3
     trees["apple"]      = 3
     trees["aspen"]      = 3
     trees["bush"]       = 3
-    trees["jungletree"] = 3
+    trees["jungletree"] = 2
     trees["pine"]       = 3
     trees["spine"]      = 3
 
