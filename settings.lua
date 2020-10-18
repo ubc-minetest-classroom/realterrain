@@ -1,5 +1,7 @@
 -- for trees/bushes with multiple variants, omitting the final number will randomize the selection (i.e. apple = random apple tree of three possibilities)
+-- for shrubs with multiple lengths (grass, marram_grass, fern, dry_grass) if randomize is 1 then the shrub length will be randomized, regardless of which length is picked
 -- for probability values, anything but a whole number between 1-100 will default to 0, except for decimals which will be rounded to the nearest whole number
+-- see the "schems" folder for tree options. To add new trees create a 9x?x9 mask around the tree using the Minetest-WorldEdit tool and save as an .mts file. Then update randomize_trees() in mapgen.lua to include the new tree type.
 local settings_table = {
 --  {"setting_name",    "type",         "value"},
 
@@ -44,13 +46,13 @@ local settings_table = {
     {"b3ground",		"string",		"default:dirt_with_grass"},
     {"b3ground2",		"string",		""},
     {"b3gprob",		    "number",		0},
-    {"b3tree",		    "string",		"rose"},
+    {"b3tree",		    "string",		"flower_tulip"},
     {"b3tprob",		    "number",		1},
     {"b3tree2",		    "string",		"bush2"},
     {"b3tprob2",		"number",		5},
     {"b3shrub",		    "string",		"default:grass_1"},
     {"b3sprob",		    "number",		20},
-    {"b3shrub2",		"string",		"flowers:dandelion_yellow"},
+    {"b3shrub2",		"string",		"flowers:dandelion_white"},
     {"b3sprob2",		"number",		5},
 
     --#282828 (gray7) deciduous forest
@@ -70,23 +72,23 @@ local settings_table = {
     {"b5ground",		"string",		"default:dirt_with_rainforest_litter"},
     {"b5ground2",		"string",		"default:water_source"},
     {"b5gprob",		    "number",		30},
-    {"b5tree",		    "string",		""},
-    {"b5tprob",		    "number",		0},
-    {"b5tree2",		    "string",		""},
-    {"b5tprob2",		"number",		0},
+    {"b5tree",		    "string",		"flower_rose"},
+    {"b5tprob",		    "number",		1},
+    {"b5tree2",		    "string",		"marshtree"},
+    {"b5tprob2",		"number",		20},
     {"b5shrub",		    "string",		"default:junglegrass"},
-    {"b5sprob",		    "number",		30},
-    {"b5shrub2",		"string",		"default:grass_5"},
-    {"b5sprob2",		"number",		20},
+    {"b5sprob",		    "number",		60},
+    {"b5shrub2",		"string",		"flowers:dandelion_yellow"},
+    {"b5sprob2",		"number",		10},
 
     --#3C3C3C (gray5) jungle
     {"b6ground",		"string",		"default:dirt_with_rainforest_litter"},
     {"b6ground2",		"string",		""},
     {"b6gprob",		    "number",		0},
     {"b6tree",		    "string",		"jungletree"},
-    {"b6tprob",		    "number",		15},
-    {"b6tree2",		    "string",		""},
-    {"b6tprob2",		"number",		0},
+    {"b6tprob",		    "number",		13},
+    {"b6tree2",		    "string",		"jungletree3"},
+    {"b6tprob2",		"number",		2},
     {"b6shrub",		    "string",		"default:junglegrass"},
     {"b6sprob",		    "number",		30},
     {"b6shrub2",		"string",		"flowers:geranium"},
@@ -97,7 +99,7 @@ local settings_table = {
     {"b7ground2",		"string",		""},
     {"b7gprob",		    "number",		0},
     {"b7tree",		    "string",		"acacia"},
-    {"b7tprob",		    "number",		.05},
+    {"b7tprob",		    "number",		1},
     {"b7tree2",		    "string",		""},
     {"b7tprob2",		"number",		0},
     {"b7shrub",		    "string",		"default:dry_grass_1"},
@@ -152,10 +154,10 @@ local settings_table = {
     {"b2tprob",		    "number",		0},
     {"b2tree2",		    "string",		""},
     {"b2tprob2",		"number",		0},
-    {"b2shrub",		    "string",		"default:grass_2"},
+    {"b2shrub",		    "string",		"default:grass_1"},
     {"b2sprob",		    "number",		20},
-    {"b2shrub2",		"string",		"default:grass_3"},
-    {"b2sprob2",		"number",		3},
+    {"b2shrub2",		"string",		""},
+    {"b2sprob2",		"number",		0},
 
 }
 

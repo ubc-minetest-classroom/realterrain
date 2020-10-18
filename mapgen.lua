@@ -1,10 +1,13 @@
 -- mapgen.lua
 --------------------------------------------------------
 -- 1. define variables & following functions:
--- 2. build_cids()
--- 3. is_dirt()
--- 4. height_fill_below()
--- 5. generate()
+-- 2. in_table()
+-- 3. build_cids()
+-- 4. is_dirt()
+-- 5. randomize_trees()
+-- 6. randomize_shrubs()
+-- 7. height_fill_below()
+-- 8. generate()
 
 local SCHEMS_PATH = realterrain.schems_path
 local alpine_level = tonumber(realterrain.settings.alpinelevel)
@@ -15,17 +18,38 @@ local add_vegetation = tonumber(realterrain.settings.vegetation)
 local randomize = tonumber(realterrain.settings.randomize)
 local add_bugs = tonumber(realterrain.settings.bugs)
 local add_mushrooms = tonumber(realterrain.settings.mushrooms)
+
 local cids = nil
 local snow = nil
 local b_mushroom = nil
 local r_mushroom = nil
 local butterfly = nil
 local firefly = nil
+local junglegrass = nil
+
 local cids_grass = {}
 local cids_dry_grass = {}
 local cids_fern = {}
 local cids_marram_grass = {}
-local surface_cache = {} --used to prevent reading of DEM for skyblocks
+local tree_schems = {
+--  "treename"   = [# of schems]
+    acacia     = 3,
+    apple      = 3,
+    aspen      = 3,
+    bush       = 3,
+    jungletree = 2,
+    pine       = 3,
+    spine      = 3,
+    marshtree  = 2,
+    bonsai     = 2,
+    boulder    = 2
+}
+local tree_fload = { --trees to force load (overwriting any pre-existing nodes)
+    "jungletree3",
+    "bush1",
+    "bush2",
+    "bush3"
+}
 local neighborhood = {
 	a = {x= 1,y= 0,z= 1}, -- NW
 	b = {x= 0,y= 0,z= 1}, -- N
@@ -37,6 +61,16 @@ local neighborhood = {
 	h = {x= 0,y= 0,z=-1}, -- S
 	i = {x= 1,y= 0,z=-1}, -- SE
 }
+local surface_cache = {} --used to prevent reading of DEM for skyblocks
+
+local function in_table(items, item)
+    for _,v in pairs(items) do
+      if v == item then
+        return true
+      end
+    end
+    return false
+end
 
 local function build_cids()
     --turn various content ids into variables for speed
@@ -83,6 +117,7 @@ local function build_cids()
     r_mushroom = minetest.get_content_id("flowers:mushroom_red")
     butterfly = minetest.get_content_id("butterflies:butterfly_white")
     firefly = minetest.get_content_id("fireflies:firefly")
+    junglegrass = minetest.get_content_id("default:junglegrass")
     for i = 1, 5 do
         table.insert(cids_grass, minetest.get_content_id("default:grass_" .. i))
         table.insert(cids_dry_grass, minetest.get_content_id("default:dry_grass_" .. i))
@@ -92,31 +127,6 @@ local function build_cids()
         table.insert(cids_marram_grass, minetest.get_content_id("default:marram_grass_" .. i))
 	end
 
-end
-
-local function height_fill_below(x,z,heightmap)
---this function gets the height needed to fill below a node
-
-	local height = 0
-	local height_in_chunk = 0
-	local height_below_chunk = 0
-	local below_positions = {}
-	local elev = heightmap[z][x].elev
-	for dir, offset in pairs(neighborhood) do
-		--get elev for all surrounding nodes
-		if dir == "b" or dir == "d" or dir == "f" or dir == "h" then
-			
-			if heightmap[z+offset.z] and heightmap[z+offset.z][x+offset.x] and heightmap[z+offset.z][x+offset.x].elev then
-				local nelev = heightmap[z+offset.z][x+offset.x].elev
-				-- if the neighboring height is more than one down, check if it is the furthest down
-				if elev > ( nelev) and height < (elev-nelev) then
-					height = elev - nelev
-				end
-			end
-		end
-	end
-	--print(height)
-	return height -1
 end
 
 local function is_dirt(ground, cids)
@@ -130,26 +140,8 @@ local function is_dirt(ground, cids)
     )
 end
 
-local function in_table(items, item)
-    for _,v in pairs(items) do
-      if v == item then
-        return true
-      end
-    end
-    return false
-end
-
 local function randomize_trees(tree)
-    trees = {} -- "treename", number of schems
-    trees["acacia"]     = 3
-    trees["apple"]      = 3
-    trees["aspen"]      = 3
-    trees["bush"]       = 3
-    trees["jungletree"] = 2
-    trees["pine"]       = 3
-    trees["spine"]      = 3
-
-    local schems = trees[tree]
+    local schems = tree_schems[tree]
     if schems and schems > 0 then
         return tree .. math.random(1,schems)
     end
@@ -158,6 +150,14 @@ end
 
 local function randomize_shrubs(shrub, add_bugs, add_mushrooms)    
 
+    -- insert bugs among junglegrass
+    if shrub == junglegrass then
+        if add_bugs and math.random(1,30) == 1 then -- 1 in 30 chance of bug
+            return math.random(1,2) == 1 and butterfly or firefly -- 50/50 mix of butterflies and fireflies
+        end
+        return shrub
+    end
+    
     -- randomize grass
     if in_table(cids_grass, shrub) then
         if add_bugs and math.random(1,30) == 1 then -- 1 in 30 chance of bug
@@ -192,7 +192,32 @@ local function randomize_shrubs(shrub, add_bugs, add_mushrooms)
 
     return shrub
 end
-        
+
+local function height_fill_below(x,z,heightmap)
+--this function gets the height needed to fill below a node
+
+	local height = 0
+	local height_in_chunk = 0
+	local height_below_chunk = 0
+	local below_positions = {}
+	local elev = heightmap[z][x].elev
+	for dir, offset in pairs(neighborhood) do
+		--get elev for all surrounding nodes
+		if dir == "b" or dir == "d" or dir == "f" or dir == "h" then
+			
+			if heightmap[z+offset.z] and heightmap[z+offset.z][x+offset.x] and heightmap[z+offset.z][x+offset.x].elev then
+				local nelev = heightmap[z+offset.z][x+offset.x].elev
+				-- if the neighboring height is more than one down, check if it is the furthest down
+				if elev > ( nelev) and height < (elev-nelev) then
+					height = elev - nelev
+				end
+			end
+		end
+	end
+	--print(height)
+	return height -1
+end
+
 function realterrain.generate(minp, maxp)
     -------------------------------------
     -- this section creates the heightmap
@@ -365,7 +390,7 @@ function realterrain.generate(minp, maxp)
                   
             -- sub-alpine vegetation
             if y > alpine_level and y < alpine_level + sub_alpine then
-                if (cover == 4 or cover == 9) and math.random(1,5) == 1 then -- cover 4 and 9 have trees
+                if (cover == 4 or cover == 9) and math.random(1,25) == 1 then -- cover 4 and 9 have trees
                     local tree = (math.random(1,15) == 1) and "spine2" or "spine1"
                     table.insert(treemap, {pos={x=x,y=y,z=z}, type=tree})
                     return nil
@@ -436,6 +461,7 @@ function realterrain.generate(minp, maxp)
             local sub_alpine_random = (sub_alpine > 0) and (sub_alpine + alpine_random) or 0       
             local node_data = nil
 			local vi = area:index(x, y0, z) -- voxelmanip index
+            local surface_is_water = false
             
             if not cover or cover < 0 or cover > 9 then
                 cover = 0
@@ -450,7 +476,8 @@ function realterrain.generate(minp, maxp)
 				elseif y == elev or (y < elev and y >= (elev - height)) then
                     -- current node has a y coordinate equal to elevation defined in DEM (or ?)
                     node_data = build_surface(y, cids, cover, alpine_level_random, water_level, kelp_min_depth)
-                elseif add_vegetation and y == elev + 1 and elev >= water_level then
+                    surface_is_water = (node_data == cids["water_source"]) and true or false
+                elseif add_vegetation and not surface_is_water and y == elev + 1 and elev >= water_level then
                     -- current node has a y coordinate one more than elevation defined in DEM and is above the water level
                     node_data = build_vegetation(x, y, z, cids, cover, alpine_level_random, sub_alpine_random, treemap, add_bugs, add_mushrooms)
                 elseif y <= water_level then
@@ -498,7 +525,11 @@ function realterrain.generate(minp, maxp)
 	--place all the trees (schems assumed to be 9x9 bases with tree in center)
 	for _, tree in ipairs(treemap) do
         local radius = 4
-		minetest.place_schematic({x=tree.pos.x-radius,y=tree.pos.y,z=tree.pos.z-radius}, SCHEMS_PATH..tree.type..".mts", "random", nil, false)
+        local force_placement = false
+        if in_table(tree_fload, tree.type) then
+            force_placement = true
+        end
+		minetest.place_schematic({x=tree.pos.x-radius,y=tree.pos.y,z=tree.pos.z-radius}, SCHEMS_PATH..tree.type..".mts", "random", nil, force_placement)
 	end
 
 end

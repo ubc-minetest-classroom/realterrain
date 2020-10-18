@@ -1,4 +1,4 @@
-# RealTerrain Lite (v.0.1.1)
+# RealTerrain Lite (v.0.1.2)
 A Minetest mod that brings real world Terrain into the game (using freely available DEM tiles). Any image can actually be used which allows for WorldPainter-style map creation using any paint program. This is a lightweight version of [bobombolo's realterrain](https://github.com/bobombolo/realterrain) mod, focusing on map generation from bitmap raster images only. 
 
 ### Examples:
@@ -84,6 +84,13 @@ a. alter the **contrast** of the image (effectively normalizes/exaggerates diffe
 b. increase/decrease the **size** of the image (this may cause artifacts which will require a light Gaussian blur to remove. Be aware that applying a Gaussian blur will likely cause some elevation data to be lost, resulting in rounder less-jagged looking mountains and valleys.)
 
 ### Changelog
+#### 0.1.2
+- updated existing tree schems so that all leaf nodes param2 is set to 0 (decay). Tested all trees by digging trunk. 
+- added grassy boulders and two new tree types (bonsai and marshtree).
+- fixed bug occuring in marsh biome where shrubs were being generated over water
+- added fireflys to marshes
+- added table of trees to force load (aka overwrite all existing nodes). Included bushes and jungletree3 (emergent jungle tree has a trunk thicker than one block)
+
 #### 0.1.1
 - forked project from [realterrain](https://github.com/bobombolo/realterrain)
 - removed ~~in-game interface~~
