@@ -98,15 +98,15 @@ b. increase/decrease the **size** of the image (this may cause artifacts which w
 #### 0.2.0
 fixed a few bugs/deficiencies:
 1. added check that all rasters are the same dimensions
-2. fixed bugs to appear/dissapear based on day/night cycle and appear at difference heights
+2. fixed bugs to appear/dissapear based on day/night cycle and appear at different heights
 3. allowed decimal percentages up to two places for very scarce vegetation
 4. fixed two errors being thrown imageloader.lua and loader_bmp.lua
 5. added checks to use default nodes when biomes.bmp image is not present in rasters folder
-6. added fix to round biomes pixel values to avoid unexpected biomes at biome boundries (in case anti-aliasing were used in biome map creation - ideally anti-aliasing should not be used)
+6. rounding biomes pixel values to avoid unexpected biomes at biome boundries (in case of anti-aliasing)
     
 added some additional features (mostly biome options):
 1. expanded available biome slots generated from the biomes raster image from 10 to 17 (17 was chosen simply because 255 is divisible by 17 and provides enough contrast between each value that it can be distinguished easily by the human eye when represented as RGB in an image, however there is no reason it couldn't be more)
-2. added several new biomes, including ocean and river (lake is the default water biome when elev falls below the water level)
+2. added several new biomes, including ocean and river (lake is the default water biome)
 3. waterlily generation (with probability and max depth settings)
 4. base vegetation defined by surface node type (i.e. grass appears over dirt_with_grass)
 5. added generateores option to settings
