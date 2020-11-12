@@ -16,7 +16,7 @@ local settings_table = {
     {"yoffset",         "number",       0},                         -- increase/decrease offset along y (vertical) axis
     {"xoffset",         "number",       0},                         -- increase/decrease offset along x (east-west) axis (i.e. 886)
     {"zoffset",         "number",       0},                         -- increase/decrease offset along z (north-south) axis (i.e. -997)
-    {"centermap",       "boolean",      true},                      -- boolean, if true xoffset/zoffset will be set to half of raster width/breadth
+    {"centermap",       "boolean",      true},                      -- boolean, if true xoffset/zoffset will be set to half of raster width/height
 
     {"alpinelevel",     "number",       100},                       -- height of alpine biome start (i.e. 150)
     {"subalpine",       "number",       30},                        -- offset for sub_alpine zone set to 0 for none

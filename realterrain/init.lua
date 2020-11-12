@@ -8,7 +8,7 @@
 -- 6. call init function
 
 -- local variables
-local MOD_PATH = minetest.get_modpath("realterrainlite")
+local MOD_PATH = minetest.get_modpath("realterrain")
 local LIB_PATH = MOD_PATH .. "/lib/"
 local RASTER_PATH = MOD_PATH .. "/rasters/"
 local SCHEMS_PATH = MOD_PATH .. "/schems/" -- used in mapgen.lua

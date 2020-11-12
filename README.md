@@ -30,15 +30,19 @@ The following three examples were generated from grayscale DEM (Digital Elevatio
 ![moon2](https://user-images.githubusercontent.com/7158003/95473288-88dfd380-09b6-11eb-8b8d-6cadc7617a81.png)
 
 ### Dependencies:
-- this mod works out of the box with no libraries when using color BMP source raster images
-- bitmap images should be grayscale, but saved with RGB color and 24-bit depth with Windows headers (color images will work, but results are likely to differ from what is expected)
+- this mod works out of the box with no libraries when using color BMP raster images
 - mod security needs to be disabled (close Minetest and add **secure.enable_security = false** to minetest.config)
 
-### Instructions
-- install the mod as usual and launch the game with mod enabled to view demo
-- if you encounter errors, check that **enable_security** is false and the **mod path** is /realterrain not /realterrain-master
+### Mod Instructions
+- download the zip file and copy the realterrain folder to /minetest/mods/
 - edit the mod settings.lua file to suit your needs (not required, default settings should work)
-- ensure that grayscale images for dem and biomes are the same length and width (only dem raster image file is required, if no biomes image is present default nodes will be used).
+- launch Minetest, create a new world, enable mod and launch game to load the demo
+- optionally use chat command **/generate** to generate all nodes defined by the demo map
+
+### Custom Map Instructions
+- use any image editing software to "paint" a custom world.
+- using gray tones is recommended, but image should be saved as RGB with 24-bit depth and Windows headers
+- ensure that dem and biomes images are the same dimensions (only dem is required)
 - dem.bmp is converted to an 8-bit heightmap with elevation range from 0 (black) to 255 (white)
 - biomes.bmp is likewise read as 8-bit with pixel values rounded to one of 17 biome definitions.
 
@@ -46,7 +50,7 @@ The following three examples were generated from grayscale DEM (Digital Elevatio
  
 ### Biome Definitions
 
-Biomes are defined in settings.lua and are rounded to one of 17 values between 0 and 255. Using the following color values in biomes.bmp will result in the corresponding biome:
+Biomes are defined in settings.lua and are represented by one of 17 values between 0 and 255, and 3 extra values for hard-coded biome definitions. Using the following color values in biomes.bmp will result in the corresponding biome:
 
 8-Bit Value | Hex Color | Color   | Biome
 | ------    | ------    | ------  | ------
