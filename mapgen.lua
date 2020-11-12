@@ -52,11 +52,11 @@ local function build_cids()
     for i = 1, 5 do
         table.insert(cids_grass, minetest.get_content_id("default:grass_" .. i))
         table.insert(cids_dry_grass, minetest.get_content_id("default:dry_grass_" .. i))
-	end
-	for i = 1, 3 do
+    end
+    for i = 1, 3 do
         table.insert(cids_fern, minetest.get_content_id("default:fern_" .. i))
         table.insert(cids_marram_grass, minetest.get_content_id("default:marram_grass_" .. i))
-	end
+    end
     -- cids_bugs
     table.insert(cids_bugs, minetest.get_content_id("butterflies:butterfly_white"))
     --table.insert(cids_bugs, minetest.get_content_id("butterflies:butterfly_violet"))
@@ -95,11 +95,11 @@ local function build_biomes()
         return s == nil or s == ''
     end
     for _ in pairs(threshholds) do threshhold_cnt = threshhold_cnt + 1 end
-	for i = 1, threshhold_cnt do
+    for i = 1, threshhold_cnt do
         
         local threshhold      = threshholds[i]
         local prefixnum = i <= 10 and "0" .. i-1 or i-1
-		local prefix = "b" .. prefixnum
+        local prefix = "b" .. prefixnum
         local ground1_setting = realterrain.settings[prefix.."ground1"]
         local ground2_setting = realterrain.settings[prefix.."ground2"]
         local gprob_setting   = realterrain.settings[prefix.."gprob"]
@@ -112,28 +112,28 @@ local function build_biomes()
         local tree2_setting   = realterrain.settings[prefix.."tree2"]
         local tprob2_setting  = realterrain.settings[prefix.."tprob2"]
         
-		local ground1 = (ground1_setting) and ground1_setting or ground_default
-		local ground2 = (ground2_setting and gprob_setting > 0) and ground2_setting or ground1
-		local shrub1  = (shrub1_setting and sprob1_setting > 0) and shrub1_setting or shrub_default
-		local shrub2  = (shrub2_setting and sprob2_setting > 0) and shrub2_setting or shrub1
-		local tree1  = (tree1_setting and tprob1_setting > 0) and tree1_setting or tree_default
-		local tree2  = (tree2_setting and tprob2_setting > 0) and tree2_setting or tree1
+        local ground1 = (ground1_setting) and ground1_setting or ground_default
+        local ground2 = (ground2_setting and gprob_setting > 0) and ground2_setting or ground1
+        local shrub1  = (shrub1_setting and sprob1_setting > 0) and shrub1_setting or shrub_default
+        local shrub2  = (shrub2_setting and sprob2_setting > 0) and shrub2_setting or shrub1
+        local tree1  = (tree1_setting and tprob1_setting > 0) and tree1_setting or tree_default
+        local tree2  = (tree2_setting and tprob2_setting > 0) and tree2_setting or tree1
         
-		biomes[threshhold] = {
+        biomes[threshhold] = {
             
-			ground1 = minetest.get_content_id(ground1),
-			ground2 = minetest.get_content_id(ground2),
+            ground1 = minetest.get_content_id(ground1),
+            ground2 = minetest.get_content_id(ground2),
             gprob   = gprob_setting,
-			shrub1  = shrub1 and minetest.get_content_id(shrub1) or nil,
+            shrub1  = shrub1 and minetest.get_content_id(shrub1) or nil,
             sprob1  = sprob1_setting,
-			shrub2  = shrub2 and minetest.get_content_id(shrub2) or nil,
+            shrub2  = shrub2 and minetest.get_content_id(shrub2) or nil,
             sprob2  = sprob2_setting,
-			tree1   = tree1,
+            tree1   = tree1,
             tprob1  = tprob1_setting,
-			tree2   = tree2,
+            tree2   = tree2,
             tprob2  = tprob2_setting,
-		}
-	end
+        }
+    end
 end
 local function build_shafts()
     for _, shaft in ipairs(realterrain.shafts) do
@@ -323,103 +323,103 @@ function realterrain.generate(minp, maxp)
     -------------------------------------
     -- this section creates the heightmap
     -------------------------------------
-	local t0 = os.clock()
-	local x1 = maxp.x
-	local y1 = maxp.y
-	local z1 = maxp.z
+    local t0 = os.clock()
+    local x1 = maxp.x
+    local y1 = maxp.y
+    local z1 = maxp.z
 
-	local x0 = minp.x
-	local y0 = minp.y
-	local z0 = minp.z
-	
-	local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
-	local area = VoxelArea:new { MinEdge = emin, MaxEdge = emax }
-	local data = vm:get_data()
-	local data2 = vm:get_param2_data()
-	local sidelen = x1 - x0 + 1
-	local ystridevm = area.ystride
+    local x0 = minp.x
+    local y0 = minp.y
+    local z0 = minp.z
+    
+    local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
+    local area = VoxelArea:new { MinEdge = emin, MaxEdge = emax }
+    local data = vm:get_data()
+    local data2 = vm:get_param2_data()
+    local sidelen = x1 - x0 + 1
+    local ystridevm = area.ystride
 
-	--calculate the chunk coordinates
-	local cx0 = math.ceil(x0 / sidelen)
-	local cy0 = math.ceil(y0 / sidelen)
-	local cz0 = math.ceil(z0 / sidelen)
-	
-	--check to see if the current chunk is above (or below) the elevation range for this footprint
-	if surface_cache[cz0] and surface_cache[cz0][cx0] then
-		if surface_cache[cz0][cx0].offelev then
-			local chugent = math.ceil((os.clock() - t0) * 1000)
-			return
-		end
-		if y0 >= surface_cache[cz0][cx0].maxelev then
-			local chugent = math.ceil((os.clock() - t0) * 1000)
-			vm:set_data(data)
-			vm:calc_lighting()
-			vm:write_to_map(data)
-			vm:update_liquids()
-			return
-		end
-	end
-	
-	local buffer = 0
-	local heightmap = realterrain.build_heightmap(x0-buffer, x1+buffer, z0-buffer, z1+buffer) --build the heightmap
-	local minelev, maxelev --calculate the min and max elevations for skipping certain blocks completely
-	for z=z0, z1 do
-		for x=x0, x1 do
-			local elev
-			if heightmap[z] and heightmap[z][x] then
-				elev = heightmap[z][x].elev
-				if elev then
-					if not minelev then
-						minelev = elev
-						maxelev = elev
-					else
-						if elev < minelev then
-							minelev = elev
-						end
-						if elev > maxelev then
-							maxelev = elev
-						end
-					end
-				end
-			end
-		end
-	end
+    --calculate the chunk coordinates
+    local cx0 = math.ceil(x0 / sidelen)
+    local cy0 = math.ceil(y0 / sidelen)
+    local cz0 = math.ceil(z0 / sidelen)
+    
+    --check to see if the current chunk is above (or below) the elevation range for this footprint
+    if surface_cache[cz0] and surface_cache[cz0][cx0] then
+        if surface_cache[cz0][cx0].offelev then
+            local chugent = math.ceil((os.clock() - t0) * 1000)
+            return
+        end
+        if y0 >= surface_cache[cz0][cx0].maxelev then
+            local chugent = math.ceil((os.clock() - t0) * 1000)
+            vm:set_data(data)
+            vm:calc_lighting()
+            vm:write_to_map(data)
+            vm:update_liquids()
+            return
+        end
+    end
+    
+    local buffer = 0
+    local heightmap = realterrain.build_heightmap(x0-buffer, x1+buffer, z0-buffer, z1+buffer) --build the heightmap
+    local minelev, maxelev --calculate the min and max elevations for skipping certain blocks completely
+    for z=z0, z1 do
+        for x=x0, x1 do
+            local elev
+            if heightmap[z] and heightmap[z][x] then
+                elev = heightmap[z][x].elev
+                if elev then
+                    if not minelev then
+                        minelev = elev
+                        maxelev = elev
+                    else
+                        if elev < minelev then
+                            minelev = elev
+                        end
+                        if elev > maxelev then
+                            maxelev = elev
+                        end
+                    end
+                end
+            end
+        end
+    end
 
-	-- if there were elevations in this footprint then add the min and max to the cache table if not already there
-	if minelev then
-		if not surface_cache[cz0] then
-			surface_cache[cz0] = {}
-		end
-		if not surface_cache[cz0][cx0] then
-			surface_cache[cz0][cx0] = {minelev = minelev, maxelev=maxelev}
-		end
-	else
-		--otherwise this chunk was off the DEM raster
-		if not surface_cache[cz0] then
-			surface_cache[cz0] = {}
-		end
-		if not surface_cache[cz0][cx0] then
-			surface_cache[cz0][cx0] = {offelev=true}
-		end
-		local chugent = math.ceil((os.clock() - t0) * 1000)
-		return
-	end
-	--print(dump(heightmap))
+    -- if there were elevations in this footprint then add the min and max to the cache table if not already there
+    if minelev then
+        if not surface_cache[cz0] then
+            surface_cache[cz0] = {}
+        end
+        if not surface_cache[cz0][cx0] then
+            surface_cache[cz0][cx0] = {minelev = minelev, maxelev=maxelev}
+        end
+    else
+        --otherwise this chunk was off the DEM raster
+        if not surface_cache[cz0] then
+            surface_cache[cz0] = {}
+        end
+        if not surface_cache[cz0][cx0] then
+            surface_cache[cz0][cx0] = {offelev=true}
+        end
+        local chugent = math.ceil((os.clock() - t0) * 1000)
+        return
+    end
+    --print(dump(heightmap))
     
     -------------------------------------
     -- this section generates the map
     -------------------------------------
     if cids_grass[1] == nil then
         build_cids()
-	end
+    end
     if biomes[1] == nil then
         build_biomes()
-	end
+    end
     if shafts[1] == nil then
         build_shafts()
-	end
+    end
     
-	for z = z0, z1 do
+    for z = z0, z1 do
         for x = x0, x1 do
             if heightmap[z] and heightmap[z][x] and heightmap[z][x]["elev"] then
                 
@@ -462,38 +462,38 @@ function realterrain.generate(minp, maxp)
                 
             end --end if pixel is in heightmap
         end -- end for x
-	end -- end for z
+    end -- end for z
 
     -- set decorations in fillmap to air to avoid collisions with tree schems
     for _, trunk in ipairs(fillmap) do
-		for i in area:iterp(trunk.pos1, trunk.pos2) do
+        for i in area:iterp(trunk.pos1, trunk.pos2) do
            data[i] = air_default
-		end
+        end
     end
     fillmap = {} -- empty fillmap table between each chunk generation
 
-	vm:set_data(data)
+    vm:set_data(data)
     vm:set_param2_data(data2)
 
     if generate_ores then
         minetest.generate_ores(vm, minp, maxp)
     end
     
-	vm:calc_lighting()
-	vm:write_to_map(data)
-	vm:update_liquids()
+    vm:calc_lighting()
+    vm:write_to_map(data)
+    vm:update_liquids()
 
-	-- sort trees based on foliage height (shortest first) then place all the trees
+    -- sort trees based on foliage height (shortest first) then place all the trees
     -- a.order > b.order results in ordering of 3,2,1,0 with items at the beginning of the list (high foliage) overwriting those at the end (low foliage)
     table.sort(treemap, function(a,b) return a.order > b.order end)
     for _, tree in ipairs(treemap) do
         --minetest.place_schematic_on_vmanip(vm, {x=tree.pos.x-tree.radius,y=tree.pos.y,z=tree.pos.z-tree.radius}, SCHEMS_PATH..tree.name..".mts", tree.rotation, nil, false)
         minetest.place_schematic({x=tree.pos.x-tree.radius,y=tree.pos.y,z=tree.pos.z-tree.radius}, SCHEMS_PATH..tree.name..".mts", tree.rotation, nil, false)
-	end
+    end
     
     -- set node_timer for all bugs in bugmap
     for _, bug in ipairs(bugmap) do
-		minetest.get_node_timer(bug.pos):start(1)
-	end
+        minetest.get_node_timer(bug.pos):start(1)
+    end
     
 end

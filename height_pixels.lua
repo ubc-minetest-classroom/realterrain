@@ -26,47 +26,47 @@ end
 
 --the raw get pixel method that uses the selected method and accounts for bit depth
 local function get_raw_pixel(x,z, rastername) -- "rastername" is a string
-	--print("x: "..x.." z: "..z..", rastername: "..rastername)
-	local raster = realterrain[rastername]
-	local colstart, rowstart = 0,0
-	if raster.format == "bmp" then
-		x=x+1
-		z=z-1
-		colstart = 1
-		rowstart = -1
-	end
-	
-	z = -z
-	local r,g,b
-	local width, length
-	width = raster.width
-	length = raster.length
-	--check to see if the image is even on the raster, otherwise skip
-	if width and length and ( x >= rowstart and x <= width ) and ( z >= colstart and z <= length ) then
-		--print(rastername..": x "..x..", z "..z)
+    --print("x: "..x.." z: "..z..", rastername: "..rastername)
+    local raster = realterrain[rastername]
+    local colstart, rowstart = 0,0
+    if raster.format == "bmp" then
+        x=x+1
+        z=z-1
+        colstart = 1
+        rowstart = -1
+    end
+    
+    z = -z
+    local r,g,b
+    local width, length
+    width = raster.width
+    length = raster.length
+    --check to see if the image is even on the raster, otherwise skip
+    if width and length and ( x >= rowstart and x <= width ) and ( z >= colstart and z <= length ) then
+        --print(rastername..": x "..x..", z "..z)
 
-		local bitmap = raster.image
-		local c
-		if bitmap.pixels[z] and bitmap.pixels[z][x] then
-			c = bitmap.pixels[z][x]
-			r = c.r
-			g = c.g
-			b = c.b
-		end
+        local bitmap = raster.image
+        local c
+        if bitmap.pixels[z] and bitmap.pixels[z][x] then
+            c = bitmap.pixels[z][x]
+            r = c.r
+            g = c.g
+            b = c.b
+        end
             
         return r,g,b
-	end
+    end
 end
 
 --main function that builds a heightmap
 function realterrain.build_heightmap(x0, x1, z0, z1)
-	local heightmap = {}
-	local xscale = realterrain.settings.xscale
-	local zscale = realterrain.settings.zscale
-	local xoffset = realterrain.settings.xoffset 
-	local zoffset = realterrain.settings.zoffset 
-	local yscale = realterrain.settings.yscale
-	local yoffset = realterrain.settings.yoffset
+    local heightmap = {}
+    local xscale = realterrain.settings.xscale
+    local zscale = realterrain.settings.zscale
+    local xoffset = realterrain.settings.xoffset 
+    local zoffset = realterrain.settings.zoffset 
+    local yscale = realterrain.settings.yscale
+    local yoffset = realterrain.settings.yoffset
     local center_map = realterrain.settings.centermap
     
     local function adjust(value, scale, offset, center)
@@ -76,9 +76,9 @@ function realterrain.build_heightmap(x0, x1, z0, z1)
     local xcenter = 0
     local zcenter = 0
 
-	local rasternames = {}
-	if realterrain.settings.fileelev ~= "" then table.insert(rasternames, "elev") end
-	if realterrain.settings.filecover ~= "" then table.insert(rasternames, "cover")	end
+    local rasternames = {}
+    if realterrain.settings.fileelev ~= "" then table.insert(rasternames, "elev") end
+    if realterrain.settings.filecover ~= "" then table.insert(rasternames, "cover")    end
 
     -- loop through rasters to check that they all have the same dimensions
     local x_raster_hsh = {}
@@ -116,14 +116,14 @@ function realterrain.build_heightmap(x0, x1, z0, z1)
     realterrain.raster_pos2 = { x=0+xcenter, y=255,z=0+zcenter}
 
     -- get adjusted x and z positions
-	local adjusted_x0 = adjust(x0, xscale, xoffset, xcenter)
+    local adjusted_x0 = adjust(x0, xscale, xoffset, xcenter)
     local adjusted_x1 = adjust(x1, xscale, xoffset, xcenter)
     local adjusted_z0 = adjust(z0, zscale, zoffset, zcenter)
     local adjusted_z1 = adjust(z1, zscale, zoffset, zcenter)
     
     -- loop through rasters again to build heightmap
-	for _, rastername in ipairs(rasternames) do
-		local raster = realterrain[rastername]
+    for _, rastername in ipairs(rasternames) do
+        local raster = realterrain[rastername]
         if raster.width and raster.length then
 
             -- see if we are even on the raster or that there is a raster
@@ -156,14 +156,14 @@ function realterrain.build_heightmap(x0, x1, z0, z1)
             end
             
         end
-	end	--end for rasternames
-	return heightmap
+    end    --end for rasternames
+    return heightmap
 end
 
 --after the mapgen has run, this gets the surface level
 function realterrain.get_surface(x,z)
-	local heightmap = realterrain.build_heightmap(x,x,z,z)
-	if heightmap[z] and heightmap[z][x] and heightmap[z][x]["elev"] then
-		return heightmap[z][x]["elev"]
-	end
+    local heightmap = realterrain.build_heightmap(x,x,z,z)
+    if heightmap[z] and heightmap[z][x] and heightmap[z][x]["elev"] then
+        return heightmap[z][x]["elev"]
+    end
 end

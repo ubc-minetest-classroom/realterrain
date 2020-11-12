@@ -38,28 +38,28 @@ dofile(MOD_PATH .. "/mapgen.lua")
 function realterrain.init()
 
     -- initializes global objects elev and cover
-	local rasternames = {"elev", "cover"}
-	for _, rastername in ipairs(rasternames) do
+    local rasternames = {"elev", "cover"}
+    for _, rastername in ipairs(rasternames) do
     
         local raster = realterrain[rastername]
         if realterrain.settings["file"..rastername] ~= ""  then 
 
-			--use imagesize to get the dimensions and header offset
-			local width, length, format = imagesize.imgsize(RASTER_PATH..realterrain.settings["file"..rastername])
+            --use imagesize to get the dimensions and header offset
+            local width, length, format = imagesize.imgsize(RASTER_PATH..realterrain.settings["file"..rastername])
             if width and length and format then
-			print(rastername..": format: "..format.." width: "..width.." length: "..length)
-			if string.sub(format, -3) == "bmp" or string.sub(format, -6) == "bitmap" then
-				dofile(MOD_PATH.."/lib/loader_bmp.lua")
-				local bitmap, e = imageloader.load(RASTER_PATH..realterrain.settings["file"..rastername])
-				if e then print(e) end
-				raster.image = bitmap
-				raster.width = width
-				raster.length = length
-				raster.bits = realterrain.settings[rastername.."bits"]
-				raster.format = "bmp"
-			else
-				print("your file should be an uncompressed bmp")
-			end
+            print(rastername..": format: "..format.." width: "..width.." length: "..length)
+            if string.sub(format, -3) == "bmp" or string.sub(format, -6) == "bitmap" then
+                dofile(MOD_PATH.."/lib/loader_bmp.lua")
+                local bitmap, e = imageloader.load(RASTER_PATH..realterrain.settings["file"..rastername])
+                if e then print(e) end
+                raster.image = bitmap
+                raster.width = width
+                raster.length = length
+                raster.bits = realterrain.settings[rastername.."bits"]
+                raster.format = "bmp"
+            else
+                print("your file should be an uncompressed bmp")
+            end
             
             print("["..rastername.."] file: "..realterrain.settings["file"..rastername].." width: "..raster.width..", length: "..raster.length)
             end
@@ -79,28 +79,28 @@ end)
     
 -- On generated function
 minetest.register_on_generated(function(minp, maxp, seed)
-	realterrain.generate(minp, maxp)
+    realterrain.generate(minp, maxp)
 end)
 
 -- Set player privilages and status
 minetest.register_on_joinplayer(function(player)
-	local pname = player:get_player_name()
-	local privs = minetest.get_player_privs(pname)
-	privs.fly = true
-	privs.fast = true
-	privs.noclip = true
-	privs.time = true
-	privs.teleport = true
-	privs.worldedit = true
-	minetest.set_player_privs(pname, privs)
-	minetest.chat_send_player(pname, "you have been granted some privs, like fast, fly, noclip, time, teleport and worldedit")
-	local ppos = player:getpos()
-	local surface = realterrain.get_surface(math.floor(ppos.x+0.5), math.floor(ppos.z+0.5))
-	if surface then
-		player:setpos({x=ppos.x, y=surface+0.5, z=ppos.z})
-		minetest.chat_send_player(pname, "you have been moved to the surface")
-	end
-	return true
+    local pname = player:get_player_name()
+    local privs = minetest.get_player_privs(pname)
+    privs.fly = true
+    privs.fast = true
+    privs.noclip = true
+    privs.time = true
+    privs.teleport = true
+    privs.worldedit = true
+    minetest.set_player_privs(pname, privs)
+    minetest.chat_send_player(pname, "you have been granted some privs, like fast, fly, noclip, time, teleport and worldedit")
+    local ppos = player:getpos()
+    local surface = realterrain.get_surface(math.floor(ppos.x+0.5), math.floor(ppos.z+0.5))
+    if surface then
+        player:setpos({x=ppos.x, y=surface+0.5, z=ppos.z})
+        minetest.chat_send_player(pname, "you have been moved to the surface")
+    end
+    return true
 end)
 
 
