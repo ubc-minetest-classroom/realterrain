@@ -1,9 +1,9 @@
-# RealTerrain Lite (v.0.1.2)
+# Real Terrain (v.0.2.0)
 A Minetest mod that brings real world Terrain into the game (using freely available DEM tiles). Any image can actually be used which allows for WorldPainter-style map creation using any paint program. This is a lightweight version of [bobombolo's realterrain](https://github.com/bobombolo/realterrain) mod, focusing on map generation from bitmap raster images only. 
 
 ### Examples:
 
-The following three examples were generated from grayscale DEM (Digital Elevation Model) maps found online. The [Skybox Mod](https://content.minetest.net/packages/sofar/skybox/) by Auke Kok was used to enhance the look of the terrain.
+The following three examples were generated from grayscale DEM (Digital Elevation Model) maps found online. The [Skybox Mod](https://content.minetest.net/packages/sofar/skybox/) by Auke Kok was used to enhance the look of the terrain in the screenshots.
 
 #### The Himalayas
 
@@ -30,7 +30,7 @@ The following three examples were generated from grayscale DEM (Digital Elevatio
 ![moon2](https://user-images.githubusercontent.com/7158003/95473288-88dfd380-09b6-11eb-8b8d-6cadc7617a81.png)
 
 ### Dependencies:
-- this mod works out of the box with no libraries when using color BMP source rasters
+- this mod works out of the box with no libraries when using color BMP source raster images
 - bitmap images should be grayscale, but saved with RGB color and 24-bit depth with Windows headers (color images will work, but results are likely to differ from what is expected)
 - mod security needs to be disabled (close Minetest and add **secure.enable_security = false** to minetest.config)
 
@@ -38,34 +38,45 @@ The following three examples were generated from grayscale DEM (Digital Elevatio
 - install the mod as usual and launch the game with mod enabled to view demo
 - if you encounter errors, check that **enable_security** is false and the **mod path** is /realterrain not /realterrain-master
 - edit the mod settings.lua file to suit your needs (not required, default settings should work)
-- create grayscale images for heightmap and biomes that are the same length and width (only heightmap is required).
+- ensure that grayscale images for dem and biomes are the same length and width (only dem raster image file is required, if no biomes image is present default nodes will be used).
 - dem.bmp is converted to an 8-bit heightmap with elevation range from 0 (black) to 255 (white)
-- biomes.bmp is likewise read as 8-bit with pixel values rounded to one of 10 biome definitions.
+- biomes.bmp is likewise read as 8-bit with pixel values rounded to one of 17 biome definitions.
 
 ![heightmap-figure](https://user-images.githubusercontent.com/7158003/95472234-5b465a80-09b5-11eb-8bbe-d0ea1f79dc14.png)
  
 ### Biome Definitions
 
-Biomes are defined in settings.lua and can be modified to your taste. Using the following hexadecimal color values in biomes.bmp will result in the corresponding biome:
+Biomes are defined in settings.lua and are rounded to one of 17 values between 0 and 255. Using the following color values in biomes.bmp will result in the corresponding biome:
 
-| Hex Color | Color   | Biome
-| ------    | ------  | ------
-| #000000   | Black   | Beach
-| #1E1E1E   | Gray 8  | Grassland
-| #282828   | Gray 7  | Deciduous Forest
-| #323232   | Gray 6  | Marsh
-| #3C3C3C   | Gray 5  | Jungle
-| #464646   | Gray 4  | Savannah
-| #505050   | Gray 3  | Desert
-| #5A5A5A   | Gray 2  | Conifer Forest
-| #646464   | Gray 1  | Permafrost
-| #FFFFFF   | White   | Cobblestone Road
+8-Bit Value | Hex Color | Color   | Biome
+| ------    | ------    | ------  | ------
+| 0         | #000000   | Black   | Lake / Pond
+| 16        | #101010   | Gray 1  | Beach
+| 32        | #202020   | Gray 2  | Grassland
+| 48        | #303030   | Gray 3  | Bushland
+| 64        | #404040   | Gray 4  | New Deciduous Forest
+| 80        | #505050   | Gray 5  | Old Deciduous Forest
+| 96        | #606060   | Gray 6  | New Coniferous Forest
+| 112       | #707070   | Gray 7  | Old Coniferous Forest
+| 128       | #808080   | Gray 8  | Savannah
+| 144       | #909090   | Gray 9  | Desert
+| 160       | #A0A0A0   | Gray 10 | Marsh
+| 176       | #B0B0B0   | Gray 11 | Tropical Rainforest
+| 192       | #C0C0C0   | Gray 12 | Snowy Grassland
+| 208       | #D0D0D0   | Gray 13 | Tundra
+| 224       | #E0E0E0   | Gray 14 | Boreal Forest / Tiaga
+| 240       | #F0F0F0   | Gray 15 | River / Stream
+| 255       | #FFFFFF   | White   | Mossy Cobblestone Road
+| 256       | N/A       | N/A     | Ocean
+| 257       | N/A       | N/A     | Alpine
+| 258       | N/A       | N/A     | Sub-alpine
 
-![biomes-figure](https://user-images.githubusercontent.com/7158003/95472378-89c43580-09b5-11eb-9d03-173efc13ec08.png)
+
+![biomes-figure](https://user-images.githubusercontent.com/7158003/98916253-e612fb80-2505-11eb-985a-0ae59e677134.jpg)
 
 ### Grayscale DEM Procurement
 
-DEM (Digital Elevation Model) maps are freely available via a variety of sources. Just googling **grayscale DEM maps** will return plenty. I found Hi-Res grayscale DEM maps of all the planets at [Astropedia](https://astrogeology.usgs.gov/search?pmi-target=mars). Hi-Res DEM maps can be downloaded for free at [dwtkns.com](http://dwtkns.com/srtm/) and [Digital Elevation Data](http://viewfinderpanoramas.org/dem3.html). If you want to use DEM maps that are color-coded, you will need to convert them to grayscale. Here is a workflow I have used to convert the GeoTIFF files available at [dwtkns.com](http://dwtkns.com/srtm/) into grayscale DEM images:
+DEM (Digital Elevation Model) maps are freely available via a variety of sources. Just searching for **grayscale DEM maps** will return plenty. I found Hi-Res grayscale DEM maps of all the planets at [Astropedia](https://astrogeology.usgs.gov/search?pmi-target=mars). Hi-Res DEM maps can be downloaded for free at [dwtkns.com](http://dwtkns.com/srtm/) and [Digital Elevation Data](http://viewfinderpanoramas.org/dem3.html). If you want to use DEM maps that are color-coded, you will need to convert them to grayscale. Here is a workflow I have used to convert the GeoTIFF files available at [dwtkns.com](http://dwtkns.com/srtm/) into grayscale DEM images:
 
 ### GeoTIFF Conversion Workflow
 
@@ -84,6 +95,28 @@ a. alter the **contrast** of the image (effectively normalizes/exaggerates diffe
 b. increase/decrease the **size** of the image (this may cause artifacts which will require a light Gaussian blur to remove. Be aware that applying a Gaussian blur will likely cause some elevation data to be lost, resulting in rounder less-jagged looking mountains and valleys.)
 
 ### Changelog
+#### 0.2.0
+fixed a few bugs/deficiencies:
+1. added check that all rasters are the same dimensions
+2. fixed bugs to appear/dissapear based on day/night cycle and appear at difference heights
+3. allowed decimal percentages up to two places for very scarce vegetation
+4. fixed two errors being thrown imageloader.lua and loader_bmp.lua
+5. added checks to use default nodes when biomes.bmp image is not present in rasters folder
+6. added fix to round biomes pixel values to avoid unexpected biomes at biome boundries (in case anti-aliasing were used in biome map creation - ideally anti-aliasing should not be used)
+    
+added some additional features (mostly biome options):
+1. expanded available biome slots generated from the biomes raster image from 10 to 17 (17 was chosen simply because 255 is divisible by 17 and provides enough contrast between each value that it can be distinguished easily by the human eye when represented as RGB in an image, however there is no reason it couldn't be more)
+2. added several new biomes, including ocean and river (lake is the default water biome when elev falls below the water level)
+3. waterlily generation (with probability and max depth settings)
+4. base vegetation defined by surface node type (i.e. grass appears over dirt_with_grass)
+5. added generateores option to settings
+6. replace the tree_force_load table with a more comprehensive table of tree schems and properties such as:
+   - schems: number of schems for a particular tree type for randomly selecting from different shapes
+   - radius: for placing the tree correctly with the trunk in the center
+   - tradius: radius of the trunk for clearing decoration nodes that might collide with wide trunks
+7. added several new tree schems for generating biomes including grove trees, papyrus, cactus, and very large tree shapes (oak, birch, japanese maple, jeffrey pine, white pine, spruce). All schems use existing nodes available in the Minetest game.
+8. registered a chat command ("/generate", no quotes), which calls emerge_area to generate the entire area of the raster map, thus navigating the whole map to generate it is uneccesary. A map of size 500x500 takes about six minutes to generate
+
 #### 0.1.2
 - updated existing tree schems so that all leaf nodes param2 is set to 0 (decay). Tested all trees by digging trunk. 
 - added grassy boulders and two new tree types (bonsai and marshtree).

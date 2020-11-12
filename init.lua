@@ -2,19 +2,22 @@
 --------------------------------------------------------
 -- 1. define variables and init function
 -- 2. load files and run
--- 3. set mapgen variables
--- 4. register generate function defined in mapgen.lua
--- 5. set player privilages and status
+-- 3. set mapgen parameters and register generate function defined in mapgen.lua
+-- 4. set player privilages and status
+-- 5. register chat command to emerge blocks
 -- 6. call init function
 
 -- local variables
-local MOD_PATH = minetest.get_modpath("realterrain")
+local MOD_PATH = minetest.get_modpath("realterrainlite")
 local LIB_PATH = MOD_PATH .. "/lib/"
 local RASTER_PATH = MOD_PATH .. "/rasters/"
 local SCHEMS_PATH = MOD_PATH .. "/schems/" -- used in mapgen.lua
 local IE = minetest.request_insecure_environment()
 package.path = (MOD_PATH.."/lib/lua-imagesize-1.2/?.lua;"..package.path)
 local imagesize = IE.require "imagesize"
+local raster_pos1, raster_pos2 = nil -- defines the size of the map to emerge
+local context = {} -- persist emerge data between callback calls
+local mapdone = false
 
 -- global variables
 realterrain = {}
@@ -24,6 +27,13 @@ realterrain.raster_path = RASTER_PATH
 realterrain.schems_path = SCHEMS_PATH
 realterrain.elev = {}
 realterrain.cover = {}
+
+-- load files and run
+dofile(MOD_PATH .. "/settings.lua")
+dofile(LIB_PATH .. "/iohelpers.lua")
+dofile(LIB_PATH .. "/imageloader.lua")
+dofile(MOD_PATH .. "/height_pixels.lua")
+dofile(MOD_PATH .. "/mapgen.lua")
 
 function realterrain.init()
 
@@ -36,6 +46,7 @@ function realterrain.init()
 
 			--use imagesize to get the dimensions and header offset
 			local width, length, format = imagesize.imgsize(RASTER_PATH..realterrain.settings["file"..rastername])
+            if width and length and format then
 			print(rastername..": format: "..format.." width: "..width.." length: "..length)
 			if string.sub(format, -3) == "bmp" or string.sub(format, -6) == "bitmap" then
 				dofile(MOD_PATH.."/lib/loader_bmp.lua")
@@ -49,8 +60,9 @@ function realterrain.init()
 			else
 				print("your file should be an uncompressed bmp")
 			end
-
+            
             print("["..rastername.."] file: "..realterrain.settings["file"..rastername].." width: "..raster.width..", length: "..raster.length)
+            end
         else
             print("no "..rastername.." selected")
             realterrain[rastername] = {}
@@ -59,22 +71,12 @@ function realterrain.init()
     end
 end
 
--- load files and run
-dofile(LIB_PATH .. "/iohelpers.lua")
-dofile(LIB_PATH .. "/imageloader.lua")
-dofile(MOD_PATH .. "/settings.lua")
-dofile(MOD_PATH .. "/mapgen.lua")
-dofile(MOD_PATH .. "/height_pixels.lua")
-
 -- Set mapgen parameters
-minetest.register_on_mapgen_init(function(mgparams)
-    -- mgnames: v5, v6, v7, valleys, carpathian, fractal, flat, singlenode
-    -- flags: nolight, nodecorations, nosnowbiomes
-    -- use this when generating realterrain map: minetest.set_mapgen_params({mgname="singlenode", flags="nolight"})
-    -- use this after map is generated to auto-generate the rest of the world: minetest.set_mapgen_params({mgname="flat", flags="nodecorations, nosnowbiomes"})
-	minetest.set_mapgen_params({mgname="singlenode", flags="nolight"})
+minetest.register_on_mapgen_init(function()
+    minetest.set_mapgen_params(realterrain.settings.mgparams)
 end)
 
+    
 -- On generated function
 minetest.register_on_generated(function(minp, maxp, seed)
 	realterrain.generate(minp, maxp)
@@ -100,5 +102,65 @@ minetest.register_on_joinplayer(function(player)
 	end
 	return true
 end)
+
+
+-- registers a chat command to allow generation of the map without having to tediously walk every inch of it
+-- modified from https://rubenwardy.com/minetest_modding_book/en/map/environment.html#loading-blocks
+minetest.register_chatcommand("generate", {
+    params = "",
+    description = "generate the map",
+    func = function ()
+        
+        local pos1 = realterrain.raster_pos1
+        local pos2 = realterrain.raster_pos2
+        local function sec2clock(seconds)
+            local seconds = tonumber(seconds)
+            if seconds <= 0 then
+                return "00:00:00";
+            else
+                hours = string.format("%02.f", math.floor(seconds/3600));
+                mins = string.format("%02.f", math.floor(seconds/60 - (hours*60)));
+                secs = string.format("%02.f", math.floor(seconds - hours*3600 - mins *60));
+                return hours..":"..mins..":"..secs
+            end
+        end
+        if pos1 and pos2 and not mapdone then
+        
+            local map_dimensions = 0
+            local x_axis = math.abs(pos1.x) + math.abs(pos2.x)
+            local z_axis = math.abs(pos1.z) + math.abs(pos2.z)
+            map_dimensions1 = "Map dimensions:(" .. pos1.x .. ", " .. pos1.y .. ", " .. pos1.z .. ") to (" .. pos2.x .. ", " .. pos2.y .. ", " .. pos2.z .. ")"
+            map_dimensions2 = "Map has a volume of " .. x_axis * pos2.y * z_axis .. " nodes (" .. x_axis .. "*" .. pos2.y .. "*" .. z_axis .. ")"
+
+            minetest.emerge_area (pos1, pos2, function (pos, action, num_calls_remaining, context)
+                -- On first call, record number of blocks
+                if not context.total_blocks then
+                    context.total_blocks  = num_calls_remaining + 1
+                    context.loaded_blocks = 0
+                    context.start_time = os.clock()
+                end
+
+                -- Increment number of blocks loaded
+                context.loaded_blocks = context.loaded_blocks + 1
+
+                -- Send progress message
+                if context.total_blocks == context.loaded_blocks then
+                    local elapsed_time = os.clock()-context.start_time
+                    minetest.chat_send_all("Finished loading blocks! Time elapsed:" .. sec2clock(elapsed_time))
+                    minetest.chat_send_all(map_dimensions1)
+                    minetest.chat_send_all(map_dimensions2)
+                    context = {}
+                    mapdone = true
+                else
+                    local perc = 100 * context.loaded_blocks / context.total_blocks
+                    local msg  = string.format("Loading blocks %d/%d (%.2f%%)", context.loaded_blocks, context.total_blocks, perc)
+                    minetest.chat_send_all(msg)
+                end
+            end, context)
+        else
+            minetest.chat_send_all("Map is already generated!")
+        end
+    end
+})
 
 realterrain.init()

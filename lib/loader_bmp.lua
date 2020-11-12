@@ -216,7 +216,7 @@ local function load_bmp_pf(f)
 	if not infoheader then return nil, e end
 
 	local bmp = {
-		bpp = bpp,
+		--bpp = bpp,
 		w = infoheader.biWidth,
 		h = math.abs(infoheader.biHeight),
 	}
