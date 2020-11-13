@@ -8,7 +8,9 @@
 -- 6. call init function
 
 -- local variables
-local MOD_PATH = minetest.get_modpath("realterrain")
+local worldpath = minetest.get_worldpath()
+local modname = minetest.get_current_modname()
+local MOD_PATH = minetest.get_modpath(modname)
 local LIB_PATH = MOD_PATH .. "/lib/"
 local RASTER_PATH = MOD_PATH .. "/rasters/"
 local SCHEMS_PATH = MOD_PATH .. "/schems/" -- used in mapgen.lua
@@ -47,21 +49,20 @@ function realterrain.init()
             --use imagesize to get the dimensions and header offset
             local width, length, format = imagesize.imgsize(RASTER_PATH..realterrain.settings["file"..rastername])
             if width and length and format then
-            print(rastername..": format: "..format.." width: "..width.." length: "..length)
-            if string.sub(format, -3) == "bmp" or string.sub(format, -6) == "bitmap" then
-                dofile(MOD_PATH.."/lib/loader_bmp.lua")
-                local bitmap, e = imageloader.load(RASTER_PATH..realterrain.settings["file"..rastername])
-                if e then print(e) end
-                raster.image = bitmap
-                raster.width = width
-                raster.length = length
-                raster.bits = realterrain.settings[rastername.."bits"]
-                raster.format = "bmp"
-            else
-                print("your file should be an uncompressed bmp")
-            end
-            
-            print("["..rastername.."] file: "..realterrain.settings["file"..rastername].." width: "..raster.width..", length: "..raster.length)
+                print(rastername..": format: "..format.." width: "..width.." length: "..length)
+                if string.sub(format, -3) == "bmp" or string.sub(format, -6) == "bitmap" then
+                    dofile(MOD_PATH.."/lib/loader_bmp.lua")
+                    local bitmap, e = imageloader.load(RASTER_PATH..realterrain.settings["file"..rastername])
+                    if e then print(e) end
+                    raster.image = bitmap
+                    raster.width = width
+                    raster.length = length
+                    raster.bits = realterrain.settings[rastername.."bits"]
+                    raster.format = "bmp"
+                else
+                    print("your file should be an uncompressed bmp")
+                end
+                print("["..rastername.."] file: "..realterrain.settings["file"..rastername].." width: "..raster.width..", length: "..raster.length)
             end
         else
             print("no "..rastername.." selected")
@@ -73,7 +74,14 @@ end
 
 -- Set mapgen parameters
 minetest.register_on_mapgen_init(function()
-    minetest.set_mapgen_params(realterrain.settings.mgparams)
+    minetest.set_mapgen_setting("water_level", realterrain.settings.waterlevel, true)
+    minetest.set_mapgen_setting("mg_flags", realterrain.settings.mgflags, true)
+    minetest.set_mapgen_setting("mg_name", realterrain.settings.mgname, true)
+    minetest.set_mapgen_setting("mgflat_ground_level", realterrain.settings.yoffset, true)
+    minetest.set_mapgen_setting("mgflat_spflags", realterrain.settings.mgflat_spflags, true)
+    minetest.set_mapgen_setting("mgflat_large_cave_depth", realterrain.settings.mgflat_lcavedep, true)
+    minetest.set_mapgen_setting("mgflat_cave_width", realterrain.settings.mgflat_cwidth, true)
+    minetest.set_mapgen_setting_noiseparams("mg_biome_np_heat", realterrain.settings.mgbiome_heat, true)
 end)
 
     
