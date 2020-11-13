@@ -20,6 +20,7 @@ local imagesize = IE.require "imagesize"
 local raster_pos1, raster_pos2 = nil -- defines the size of the map to emerge
 local context = {} -- persist emerge data between callback calls
 local mapdone = false
+local isnewplayer = false
 
 -- global variables
 realterrain = {}
@@ -90,6 +91,10 @@ minetest.register_on_generated(function(minp, maxp, seed)
     realterrain.generate(minp, maxp)
 end)
 
+minetest.register_on_newplayer(function(player)
+	isnewplayer = true
+end)
+
 -- Set player privilages and status
 minetest.register_on_joinplayer(function(player)
     local pname = player:get_player_name()
@@ -103,11 +108,17 @@ minetest.register_on_joinplayer(function(player)
     minetest.set_player_privs(pname, privs)
     minetest.chat_send_player(pname, "you have been granted some privs, like fast, fly, noclip, time, teleport and worldedit")
     local ppos = player:getpos()
-    local surface = realterrain.get_surface(math.floor(ppos.x+0.5), math.floor(ppos.z+0.5))
-    if surface then
-        player:setpos({x=ppos.x, y=surface+0.5, z=ppos.z})
-        minetest.chat_send_player(pname, "you have been moved to the surface")
+    
+    local surface = realterrain.get_surface(0, 0)
+    local pos = {x=0, y=surface+0.5, z=0}
+    if not isnewplayer then
+        surface = realterrain.get_surface(math.floor(ppos.x+0.5), math.floor(ppos.z+0.5))
+        if surface then
+            pos = {x=ppos.x, y=surface+0.5, z=ppos.z}
+        end
     end
+    player:setpos(pos)
+    minetest.chat_send_player(pname, "you have been moved to the surface")
     return true
 end)
 
