@@ -360,10 +360,10 @@ end
 --  schems not found in this list (i.e. snowblocks, papyrus, etc.) will load with radius = 0
 realterrain.trees = {
 --  treename    = { schems,     radius,     tradius     }, -- dimensions of schem x*y*z
-    bush        = { schems = 4, radius = 2, tradius = 2 }, -- 4*2*4
-    bbush       = { schems = 4, radius = 2, tradius = 2 }, -- 4*2*4
-    pbush       = { schems = 4, radius = 2, tradius = 2 }, -- 4*2*4
-    spbush      = { schems = 4, radius = 2, tradius = 2 }, -- 4*3*4
+    bush        = { schems = 4, radius = 2, tradius = 1 }, -- 4*2*4
+    bbush       = { schems = 4, radius = 2, tradius = 1 }, -- 4*2*4
+    pbush       = { schems = 4, radius = 2, tradius = 1 }, -- 4*2*4
+    spbush      = { schems = 4, radius = 2, tradius = 1 }, -- 4*3*4
     apple       = { schems = 4, radius = 3, tradius = 0 }, -- 7*?*7
     aspen       = { schems = 4, radius = 3, tradius = 0 }, -- 7*?*7
     gtree       = { schems = 4, radius = 4, tradius = 0 }, -- 9*?*9
