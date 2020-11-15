@@ -19,8 +19,8 @@ local settings_table = {
     {"centermap",       "boolean",      true},                      -- boolean, if true xoffset/zoffset will be set to half of raster width/height
 
     -- realterrain generated map settings
-    {"alpinelevel",     "number",       130},                       -- height of alpine biome start (i.e. 150)
-    {"subalpine",       "number",       10},                        -- offset for sub_alpine zone set to 0 for none
+    {"alpinelevel",     "number",       100},                       -- height of alpine biome start (i.e. 150)
+    {"subalpine",       "number",       20},                        -- offset for sub_alpine zone set to 0 for none
     {"fillerdepth",     "number",       2},                         -- how deep the filler node is (layer between surface and bedrock)
     {"kelpmindep",      "number",       6},                         -- minimum depth required for kelp to grow (recommend 6)
     {"wlilymaxdep",     "number",       6},                         -- maximum depth allowed for lillypads to grow (recommend 6)
