@@ -26,9 +26,9 @@ local generate_ores     = realterrain.settings.generateores
 local trees             = realterrain.trees
 
 -- defaults for biome generation
-local ground_default    = minetest.get_content_id("default:stone")
-local water_default     = minetest.get_content_id("default:water_source")
-local air_default       = minetest.get_content_id("air")
+local stone             = nil
+local water             = nil
+local air               = nil
 
 -- tables
 local surface_cache     = {} -- used to prevent reading of DEM for skyblocks
@@ -49,6 +49,10 @@ local bugmap            = {} -- table of bug positions for adding timers
 local fillmap           = {} -- table of x/z positions already occupied with some decoration
 
 local function build_cids()
+    -- default nodes
+    stone = minetest.get_content_id("default:stone")
+    water = minetest.get_content_id("default:water_source")
+    air   = minetest.get_content_id("air")
     -- cids for grasses
     for i = 1, 5 do
         table.insert(cids_grass, minetest.get_content_id("default:grass_" .. i))
@@ -70,7 +74,10 @@ local function build_cids()
     table.insert(cids_mushrooms, minetest.get_content_id("flowers:mushroom_red"))
     for _ in pairs(cids_mushrooms) do cids_mushrooms_ct = cids_mushrooms_ct + 1 end
     -- cids_miscellaneous
-    cids_misc = { 
+    cids_misc = {
+        -- stone = minetest.get_content_id("default:stone"),
+        -- water = minetest.get_content_id("default:water_source"),
+        -- air = minetest.get_content_id("default:air"),
         waterlily = minetest.get_content_id("flowers:waterlily_waving"),
         sand_with_kelp = minetest.get_content_id("default:sand_with_kelp"),
         junglegrass = minetest.get_content_id("default:junglegrass"),
@@ -152,9 +159,9 @@ end
 local function get_shaft(cover, elev)
 
     -- defines y shaft of bedrock, filler, surface, and decoration based on biome
-    local bedrock       = ground_default
-    local filler        = ground_default
-    local surface       = ground_default
+    local bedrock       = stone
+    local filler        = stone
+    local surface       = stone
     local tree          = nil   -- 1 block above surface
     local shrub         = nil   -- 1 block above surface
     local waterlily     = nil   -- 1 block above lake water_level
@@ -434,7 +441,7 @@ function realterrain.generate(minp, maxp)
                     elseif y == elev then
                         node = shaft.surface
                     elseif y <= water_level then
-                        node = water_default
+                        node = water
                     elseif y > water_level then
                         -- everything else is decoration (kelp and coral are surface nodes)
                         if y == water_level+1 and shaft.waterlily then
@@ -466,7 +473,7 @@ function realterrain.generate(minp, maxp)
     -- set decorations in fillmap to air to avoid collisions with tree schems
     for _, trunk in ipairs(fillmap) do
         for i in area:iterp(trunk.pos1, trunk.pos2) do
-           data[i] = air_default
+           data[i] = air
         end
     end
 
