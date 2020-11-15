@@ -420,7 +420,7 @@ function realterrain.generate(minp, maxp)
                 local vi    = area:index(x, y0, z) -- voxelmanip index
                 local elev  = heightmap[z][x].elev -- elevation in from DEM
                 local cover = heightmap[z][x].cover -- cover in from BIOMES
-                local shaft = get_shaft(cover, elev, x, z)
+                local shaft = get_shaft(cover, elev)
 
                 for y = y0, y1 do
 
