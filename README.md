@@ -4,7 +4,7 @@ A Minetest mod that brings real world terrain into the game (using freely availa
 ![island-demo](https://user-images.githubusercontent.com/7158003/99186052-9b54e600-2788-11eb-8a8d-07e635942855.jpg)
 
 ### Dependencies:
-- this mod works out of the box with no libraries when using color BMP raster images (only DEM raster is required)
+- this mod works out of the box with no libraries when using color BMP raster images
 - mod security needs to be disabled (close Minetest and add **secure.enable_security = false** to minetest.config)
 
 ### Mod Instructions
