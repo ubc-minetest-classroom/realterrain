@@ -18,8 +18,9 @@ local settings_table = {
     {"zoffset",         "number",       0},                         -- increase/decrease offset along z (north-south) axis (i.e. -997)
     {"centermap",       "boolean",      true},                      -- boolean, if true xoffset/zoffset will be set to half of raster width/height
 
-    {"alpinelevel",     "number",       100},                       -- height of alpine biome start (i.e. 150)
-    {"subalpine",       "number",       30},                        -- offset for sub_alpine zone set to 0 for none
+    {"alpinelevel",     "number",       130},                       -- height of alpine biome start (i.e. 150)
+    {"subalpine",       "number",       10},                        -- offset for sub_alpine zone set to 0 for none
+    {"fillerdepth",     "number",       2},                         -- how deep the filler node is (layer between surface and bedrock)
     {"kelpmindep",      "number",       6},                         -- minimum depth required for kelp to grow (recommend 6)
     {"wlilymaxdep",     "number",       6},                         -- maximum depth allowed for lillypads to grow (recommend 6)
     {"wlilyprob",       "number",       40},                        -- probability of waterlily presence
@@ -210,15 +211,15 @@ local settings_table = {
     --#D0D0D0 (gray13) tundra
     {"b13ground1",      "string",       "default:permafrost_with_stones"},
     {"b13ground2",      "string",       "default:dirt_with_snow"},
-    {"b13gprob",        "number",       10},
+    {"b13gprob",        "number",       20},
     {"b13tree1",        "string",       ""},
     {"b13tprob1",       "number",       0},
     {"b13tree2",        "string",       ""},
     {"b13tprob2",       "number",       0},
-    {"b13shrub1",       "string",       "default:snow"},
-    {"b13sprob1",       "number",       20},
-    {"b13shrub2",       "string",       "flowers:viola"},
-    {"b13sprob2",       "number",       2},
+    {"b13shrub1",       "string",       "flowers:viola"},
+    {"b13sprob1",       "number",       0.5},
+    {"b13shrub2",       "string",       ""},
+    {"b13sprob2",       "number",       0},
     
     --#E0E0E0 (gray14) coniferous forest (boreal/tiaga)
     {"b14ground1",      "string",       "default:dirt_with_snow"},
@@ -392,19 +393,19 @@ realterrain.trees = {
 --  you can customize what filler (the buffer of nodes between the surface and bedrock), bedrock, base shrub as well as appearance probabilities for base shrub, bugs and mushrooms
 realterrain.shafts = {
  -- { "name of the top node",                   "filler",                   "bedrock",              "shrub",    shrub%,   bug%, shrm% }
-    { "default:dirt_with_grass",                "default:dirt",             "default:stone",        "grass",        40,     5,      0.1 },
+    { "default:dirt_with_grass",                "default:dirt",             "default:stone",        "grass",        40,     2,      0.1 },
     { "default:dirt_with_dry_grass",            "default:dirt",             "default:stone",        "dry_grass",    40,     0,      0 },
-    { "default:dirt_with_coniferous_litter",    "default:dirt",             "default:stone",        "fern",         20,     2,      1 },
-    { "default:dirt_with_rainforest_litter",    "default:dirt",             "default:stone",        "junglegrass",  60,     2,      1 },
+    { "default:dirt_with_coniferous_litter",    "default:dirt",             "default:stone",        "fern",         20,     1,      1 },
+    { "default:dirt_with_rainforest_litter",    "default:dirt",             "default:stone",        "junglegrass",  60,     1,      1 },
     { "default:dirt_with_snow",                 "default:dirt",             "default:stone",        "snow",         50,     0,      0 },
     { "default:sand",                           "default:sandstone",        "default:stone",        "marram_grass", 30,     1,      0 },
     { "default:sand_with_kelp",                 "default:sandstone",        "default:stone",        nil,            0,      0,      0 },
     { "default:coral_green",                    "default:sandstone",        "default:stone",        nil,            30,     0,      0 },
-    { "default:water_source",                   "default:dirt",             "default:stone",        "waterlily",    30,     5,      0 },
-    { "default:river_water_source",             "default:clay",             "default:stone",        nil,            0,      2,      0 },
+    { "default:water_source",                   "default:dirt",             "default:stone",        nil,            30,     5,      0 },
+    { "default:river_water_source",             "default:clay",             "default:stone",        nil,            0,      1,      0 },
     { "default:desert_sand",                    "default:desert_sandstone", "default:desert_stone", nil,            0,      0,      0 },
     { "default:silver_sand",                    "default:silver_sandstone", "default:stone",        "dry_shrub",    5,      0,      0 },
-    { "default:permafrost",                     "default:permafrost",       "default:stone",        "snow",         30,     2,      0 },
+    { "default:permafrost",                     "default:permafrost",       "default:stone",        "snow",         30,     1,      0 },
     { "default:permafrost_with_moss",           "default:permafrost",       "default:stone",        "snow",         30,     0,      0 },
     { "default:permafrost_with_stones",         "default:permafrost",       "default:stone",        "snow",         30,     0,      0 },
     { "default:snowblock",                      "default:permafrost",       "default:stone",        "snowblock",    100,    0,      0 },

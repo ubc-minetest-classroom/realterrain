@@ -14,6 +14,7 @@ local threshholds       = realterrain.threshholds
 -- flags defined in settings
 local alpine_level      = realterrain.settings.alpinelevel
 local sub_alpine        = realterrain.settings.subalpine
+local filler_depth      = realterrain.settings.fillerdepth
 local water_level       = realterrain.settings.waterlevel
 local kelp_min_depth    = realterrain.settings.kelpmindep
 local wlily_max_depth   = realterrain.settings.wlilymaxdep
@@ -148,20 +149,21 @@ local function build_shafts()
         })
     end
 end
-local function get_shaft(cover, elev, x, z)
+local function get_shaft(cover, elev)
 
     -- defines y shaft of bedrock, filler, surface, and decoration based on biome
     local bedrock       = ground_default
     local filler        = ground_default
     local surface       = ground_default
-    local tree          = nil   -- 1 block  above surface
-    local shrub         = nil   -- 1 block  above surface
+    local tree          = nil   -- 1 block above surface
+    local shrub         = nil   -- 1 block above surface
+    local waterlily     = nil   -- 1 block above lake water_level
     local bug           = nil   -- 2 or more blocks above the surface
     local bug_ht        = 2     -- minimum 2 blocks above the surface
-    local waterlily     = false
     local param2        = 0
     
     -- internal variables
+    local randnum       = math.random(1,5)
     local shaft         = nil
     local bprob         = 0 -- bug probability
     local mprob         = 0 -- mushroom probability
@@ -170,8 +172,8 @@ local function get_shaft(cover, elev, x, z)
     if not no_biomes and cover then
     
         -- get biome based on cover (0:lake, 16:beach, 256:ocean, 257:alpine, 258:subalpine)
-        if elev > alpine_level then
-            cover = (sub_alpine > 0 and elev < alpine_level + sub_alpine) and 258 or 257
+        if elev > (alpine_level + randnum) then
+            cover = (sub_alpine > 0 and elev < (alpine_level + sub_alpine + randnum)) and 258 or 257
         elseif cover > 0 and elev < water_level - kelp_min_depth then
             cover = 256 -- use ocean biome if no lake biome present and elev is less than kelp_min_depth
         elseif cover == 0 and elev >= water_level and elev <= water_level+1 then
@@ -183,7 +185,7 @@ local function get_shaft(cover, elev, x, z)
         local biome = biomes[cover]
         surface = (not no_decoration and biome.gprob >= math.random(1,100)) and biome.ground2 or biome.ground1
 
-        if not no_decoration then -- define decorations based on biome first
+        if not no_decoration and not cids_nodeco[surface] then -- define decorations based on biome first
         
             -- check settings for tree schems first
             if biome.tree1 and (biome.tprob1 * 100) >= math.random(1,10000) then -- tprob1 can be x.x%
@@ -193,7 +195,7 @@ local function get_shaft(cover, elev, x, z)
                     tree = biome.tree1
                 end
             end
-            -- check settings for shrubs if no tree
+            -- check settings for shrubs if no tree and surface allows
             if not tree then
                 if biome.shrub1 and (biome.sprob1 * 100) >= math.random(1,10000) then -- sprob1 can be x.x%
                     if biome.shrub2 and biome.sprob2 >= math.random(1,100) then -- sprob2 can be x%
@@ -215,7 +217,7 @@ local function get_shaft(cover, elev, x, z)
                 if shaft then
                     bedrock = shaft.bedrock
                     filler  = shaft.filler
-                    -- if no decoration then use shrub/bug/mushroom defined in shaft
+                    -- if no decoration and surface allows, then use shrub/bug/mushroom defined in shaft
                     if not shrub then
                         if shaft.shrub and shaft.sprob >= math.random(1,100) then -- sprob can be x%
                             -- try for shrub defined in shaft first
@@ -243,16 +245,6 @@ local function get_shaft(cover, elev, x, z)
                 end
             end
             
-            if cids_nodeco[surface] then
-                -- remove decoration from nodes in cids_deco, except for waterlily
-                if shrub == cids_misc["waterlily"] then
-                    param2 = math.floor(math.random(0,3))
-                else
-                    tree = nil
-                    shrub = nil
-                end
-            end
-            
             if wdepth > 0 then
                 -- get waterlily and param2 for kelp and waterlily
                 if cover == 256 and surface == cids_misc["sand_with_kelp"] then
@@ -261,8 +253,10 @@ local function get_shaft(cover, elev, x, z)
                     param2 = math.random(kelp_min_length, kelp_max_length) * 16 -- param2 for kelp length
                 elseif cover == 0 and wdepth <= wlily_max_depth then
                     local calc_wlily_prob = wdepth < wlily_max_depth and ((wlily_max_depth - wdepth) / wlily_max_depth) * wlily_prob or 1 -- reduce probability the deeper you go
-                    waterlily = calc_wlily_prob >= math.random(1,100) and true or false
-                    param2 = math.floor(math.random(0,3))
+                    if calc_wlily_prob >= math.random(1,100) then
+                        waterlily = cids_misc["waterlily"]
+                        param2 = math.floor(math.random(0,3))
+                    end
                 end
             end
         
@@ -423,17 +417,17 @@ function realterrain.generate(minp, maxp)
         for x = x0, x1 do
             if heightmap[z] and heightmap[z][x] and heightmap[z][x]["elev"] then
                 
-                local vi            = area:index(x, y0, z) -- voxelmanip index
-                local elev          = heightmap[z][x].elev -- elevation in from DEM
-                local cover         = heightmap[z][x].cover -- cover in from BIOMES
-                local shaft         = get_shaft(cover, elev, x, z)
+                local vi    = area:index(x, y0, z) -- voxelmanip index
+                local elev  = heightmap[z][x].elev -- elevation in from DEM
+                local cover = heightmap[z][x].cover -- cover in from BIOMES
+                local shaft = get_shaft(cover, elev, x, z)
 
                 for y = y0, y1 do
 
-                    local node  = nil
+                    local node = nil
                     
                     -- determine the node type for every node in the y column
-                    if y < elev-2 then
+                    if y < elev-filler_depth then
                         node = shaft.bedrock
                     elseif y < elev then
                         node = shaft.filler
@@ -441,15 +435,20 @@ function realterrain.generate(minp, maxp)
                         node = shaft.surface
                     elseif y <= water_level then
                         node = water_default
-                    elseif y == water_level+1 and shaft.waterlily then
-                        node = cids_misc["waterlily"]
-                    elseif y == elev+1 and y > water_level and shaft.tree then
-                        table.insert(treemap, get_tree({x=x,y=y,z=z}, shaft.tree))
-                    elseif y == elev+1 and y > water_level then
-                        node = shaft.shrub
-                    elseif y == elev+shaft.bug_ht and y > water_level and not shaft.tree then
-                        node = shaft.bug
-                        table.insert(bugmap, {pos = {x=x,y=y,z=z}})
+                    elseif y > water_level then
+                        -- everything else is decoration (kelp and coral are surface nodes)
+                        if y == water_level+1 and shaft.waterlily then
+                            node = shaft.waterlily
+                        elseif y == elev+1 then
+                            if shaft.tree then
+                                table.insert(treemap, get_tree({x=x,y=y,z=z}, shaft.tree))
+                            else
+                                node = shaft.shrub
+                            end
+                        elseif y == elev+shaft.bug_ht and not shaft.tree then
+                            node = shaft.bug
+                            table.insert(bugmap, {pos = {x=x,y=y,z=z}})
+                        end
                     end
                     
                     if node then
@@ -470,7 +469,7 @@ function realterrain.generate(minp, maxp)
            data[i] = air_default
         end
     end
-    fillmap = {} -- empty fillmap table between each chunk generation
+
 
     vm:set_data(data)
     vm:set_param2_data(data2)
@@ -495,5 +494,10 @@ function realterrain.generate(minp, maxp)
     for _, bug in ipairs(bugmap) do
         minetest.get_node_timer(bug.pos):start(1)
     end
+    
+    -- reset chunk specific cache between each chunk
+    fillmap = {}
+    treemap = {}
+    bugmap = {}
     
 end

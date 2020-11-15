@@ -1,43 +1,18 @@
 # Real Terrain (v.0.2.1)
-A Minetest mod that brings real world Terrain into the game (using freely available DEM tiles). Any image can actually be used which allows for WorldPainter-style map creation using any paint program. This is a lightweight version of [bobombolo's realterrain](https://github.com/bobombolo/realterrain) mod, focusing on map generation from bitmap raster images only. 
+A Minetest mod that brings real world terrain into the game (using freely available DEM tiles). Any image can actually be used which allows for WorldPainter-style map creation using any paint program. This is a lightweight version of [bobombolo's realterrain](https://github.com/bobombolo/realterrain) mod, focusing on map generation from bitmap raster images only. 
 
-### Examples:
-
-The following three examples were generated from grayscale DEM (Digital Elevation Model) maps found online. The [Skybox Mod](https://content.minetest.net/packages/sofar/skybox/) by Auke Kok was used to enhance the look of the terrain in the screenshots.
-
-#### The Himalayas
-
-![himalayas-maps](https://user-images.githubusercontent.com/7158003/95472925-28509680-09b6-11eb-8a16-c25f8832a847.png)
-
-![himalayas1](https://user-images.githubusercontent.com/7158003/95472554-c6902c80-09b5-11eb-9877-9da221903ff3.png)
-
-![himalayas2](https://user-images.githubusercontent.com/7158003/95473009-3c949380-09b6-11eb-92b4-67922863f0ea.png)
-
-#### The Grand Canyon
-
-![canyon-maps](https://user-images.githubusercontent.com/7158003/95473087-51712700-09b6-11eb-8e44-2ccaa4ca2de3.png)
-
-![gcanyon1](https://user-images.githubusercontent.com/7158003/95473121-5cc45280-09b6-11eb-8dcf-a6895de4256a.png)
-
-![gcanyon2](https://user-images.githubusercontent.com/7158003/95473165-68177e00-09b6-11eb-9e4b-2f2247939336.png)
-
-#### The Moon
-
-![moon-maps](https://user-images.githubusercontent.com/7158003/95473219-75cd0380-09b6-11eb-89dc-8152d4f6af19.png)
-
-![moon1](https://user-images.githubusercontent.com/7158003/95473257-7fef0200-09b6-11eb-8fd6-c04cb5dcc1f6.png)
-
-![moon2](https://user-images.githubusercontent.com/7158003/95473288-88dfd380-09b6-11eb-8b8d-6cadc7617a81.png)
+![island-demo](https://user-images.githubusercontent.com/7158003/99186052-9b54e600-2788-11eb-8a8d-07e635942855.jpg)
 
 ### Dependencies:
-- this mod works out of the box with no libraries when using color BMP raster images
+- this mod works out of the box with no libraries when using color BMP raster images (only DEM raster is required)
 - mod security needs to be disabled (close Minetest and add **secure.enable_security = false** to minetest.config)
 
 ### Mod Instructions
 - download the zip file and copy the realterrain folder to /minetest/mods/ (remove **-master** suffix)
 - edit the mod settings.lua file to suit your tastes (not required, default settings should work)
 - launch Minetest, create a new world, enable mod and launch game to load the demo
-- optionally use chat command **/generate** in game to generate all nodes defined by the demo map
+- optionally use chat command **/generate** in game to generate all nodes defined by the DEM raster
+- once map is generated from raster images, disable mod and the Minetest engine will generate the rest
 
 ### Custom Map Instructions
 - use any image editing software to "paint" a custom world on two BMP files (dem.bmp and biomes.bmp)
@@ -75,7 +50,6 @@ Biomes are defined in settings.lua and are represented by one of 17 values betwe
 | 257       | N/A       | N/A     | Alpine
 | 258       | N/A       | N/A     | Sub-alpine
 
-
 ![biomes-figure](https://user-images.githubusercontent.com/7158003/98916253-e612fb80-2505-11eb-985a-0ae59e677134.jpg)
 
 ### Grayscale DEM Procurement
@@ -97,6 +71,34 @@ DEM (Digital Elevation Model) maps are freely available via a variety of sources
 11. The image should render very realistic looking terrain as is, but to modify the scale on the y axis one could either: 
 a. alter the **contrast** of the image (effectively normalizes/exaggerates differences in elevation throughout)
 b. increase/decrease the **size** of the image (this may cause artifacts which will require a light Gaussian blur to remove. Be aware that applying a Gaussian blur will likely cause some elevation data to be lost, resulting in rounder less-jagged looking mountains and valleys.)
+
+### Examples:
+
+The following three examples were generated from grayscale DEM (Digital Elevation Model) maps found online. The [Skybox Mod](https://content.minetest.net/packages/sofar/skybox/) by Auke Kok was used to enhance the look of the terrain in the screenshots.
+
+#### The Himalayas
+
+![himalayas-maps](https://user-images.githubusercontent.com/7158003/95472925-28509680-09b6-11eb-8a16-c25f8832a847.png)
+
+![himalayas1](https://user-images.githubusercontent.com/7158003/95472554-c6902c80-09b5-11eb-9877-9da221903ff3.png)
+
+![himalayas2](https://user-images.githubusercontent.com/7158003/95473009-3c949380-09b6-11eb-92b4-67922863f0ea.png)
+
+#### The Grand Canyon
+
+![canyon-maps](https://user-images.githubusercontent.com/7158003/95473087-51712700-09b6-11eb-8e44-2ccaa4ca2de3.png)
+
+![gcanyon1](https://user-images.githubusercontent.com/7158003/95473121-5cc45280-09b6-11eb-8dcf-a6895de4256a.png)
+
+![gcanyon2](https://user-images.githubusercontent.com/7158003/95473165-68177e00-09b6-11eb-9e4b-2f2247939336.png)
+
+#### The Moon
+
+![moon-maps](https://user-images.githubusercontent.com/7158003/95473219-75cd0380-09b6-11eb-89dc-8152d4f6af19.png)
+
+![moon1](https://user-images.githubusercontent.com/7158003/95473257-7fef0200-09b6-11eb-8fd6-c04cb5dcc1f6.png)
+
+![moon2](https://user-images.githubusercontent.com/7158003/95473288-88dfd380-09b6-11eb-8b8d-6cadc7617a81.png)
 
 ### Changelog
 #### 0.2.1
