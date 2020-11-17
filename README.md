@@ -4,7 +4,7 @@ A Minetest mod that brings real world terrain into the game (using freely availa
 ![island-demo](https://user-images.githubusercontent.com/7158003/99186052-9b54e600-2788-11eb-8a8d-07e635942855.jpg)
 
 ### Dependencies:
-- this mod works out of the box with no libraries when using color BMP raster images
+- this mod works out of the box with no libraries when using color BMP rasters
 - mod security needs to be disabled (close Minetest and add **secure.enable_security = false** to minetest.config)
 
 ### Mod Instructions
@@ -27,28 +27,28 @@ A Minetest mod that brings real world terrain into the game (using freely availa
 
 Biomes are defined in settings.lua and are represented by one of 17 values between 0 and 255, and 3 extra values for hard-coded biome definitions. Using the following color values in biomes.bmp will result in the corresponding biome:
 
-8-Bit Value | Hex Color | Color   | Biome
-| ------    | ------    | ------  | ------
-| 0         | #000000   | Black   | Lake / Pond
-| 16        | #101010   | Gray 1  | Beach
-| 32        | #202020   | Gray 2  | Grassland
-| 48        | #303030   | Gray 3  | Bushland
-| 64        | #404040   | Gray 4  | New Deciduous Forest
-| 80        | #505050   | Gray 5  | Old Deciduous Forest
-| 96        | #606060   | Gray 6  | New Coniferous Forest
-| 112       | #707070   | Gray 7  | Old Coniferous Forest
-| 128       | #808080   | Gray 8  | Savannah
-| 144       | #909090   | Gray 9  | Desert
-| 160       | #A0A0A0   | Gray 10 | Marsh
-| 176       | #B0B0B0   | Gray 11 | Tropical Rainforest
-| 192       | #C0C0C0   | Gray 12 | Snowy Grassland
-| 208       | #D0D0D0   | Gray 13 | Tundra
-| 224       | #E0E0E0   | Gray 14 | Boreal Forest / Tiaga
-| 240       | #F0F0F0   | Gray 15 | River / Stream
-| 255       | #FFFFFF   | White   | Mossy Cobblestone Road
-| 256       | N/A       | N/A     | Ocean
-| 257       | N/A       | N/A     | Alpine
-| 258       | N/A       | N/A     | Sub-alpine
+8-Bit Value | Hex Color | Biome
+| ------    | ------    | ------
+| 0         | #000000   | Lake / Pond
+| 16        | #101010   | Beach
+| 32        | #202020   | Grassland
+| 48        | #303030   | Bushland
+| 64        | #404040   | New Deciduous Forest
+| 80        | #505050   | Old Deciduous Forest
+| 96        | #606060   | New Coniferous Forest
+| 112       | #707070   | Old Coniferous Forest
+| 128       | #808080   | Savannah
+| 144       | #909090   | Desert
+| 160       | #A0A0A0   | Marsh
+| 176       | #B0B0B0   | Tropical Rainforest
+| 192       | #C0C0C0   | Snowy Grassland
+| 208       | #D0D0D0   | Tundra
+| 224       | #E0E0E0   | Boreal Forest / Tiaga
+| 240       | #F0F0F0   | River / Stream
+| 255       | #FFFFFF   | Mossy Cobblestone Road
+| 256       | N/A       | Ocean
+| 257       | N/A       | Alpine
+| 258       | N/A       | Sub-alpine
 
 ![biomes-figure](https://user-images.githubusercontent.com/7158003/98916253-e612fb80-2505-11eb-985a-0ae59e677134.jpg)
 
