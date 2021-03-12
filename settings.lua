@@ -1,14 +1,14 @@
 -- all trees and bushes are randomized when multiple shapes exist (using "apple" will randomly pick between multiple apple tree shapes)
 -- for probability values, decimal numbers between 0 and 100 to two places (i.e. 25 or .02) are accepted. prob1 and prob2 are cumulative, meaning if prob1 and prob2 are both set to 50, prob1 will be 50 and prob2 will effectively be 25
 -- see the "schems" folder for tree options. To add new trees use the Minetest-WorldEdit tool to save your tree as an .mts file and add it to the schems folder of the realterrain mod.
--- if you are making multiple shapes of the same tree for randomization purposes, give them all the sme name them with a suffix number from 1-4 and update the "trees" table at the bottom of this page. Then use the name without the number suffix in the settings below.
+-- if you are making multiple shapes of the same tree for randomization purposes, give them all the same name them with a suffix number from 1-4 and update the "trees" table at the bottom of this page. Then use the name without the number suffix in the settings below.
 -- for ground and shrubs use the item string for any node found within the Minetest game (i.e. default:dirt). For a reference of node itemstring names, either press F5 in the Minetest game to view a nodes itemstring, or see https://wiki.minetest.net/Games/Minetest_Game/Nodes
 local settings_table = {
 --  {"setting_name",    "type",         "value"},
 
     -- default settings
-    {"fileelev",        "string",       "island_height_map.bmp"},   -- raster image file describing elevation (must be .bmp)
-    {"filecover",       "string",       "island_biome_map.bmp"},    -- raster image file describing biomes (must be .bmp)
+    {"fileelev",        "string",       "dem.bmp"},   -- raster image file describing elevation (must be .bmp)
+    {"filecover",       "string",       "biome.bmp"},    -- raster image file describing biomes (must be .bmp)
     
     {"yscale",          "number",       0.5},                         -- increase/decrease scale along y (vertical) axis
     {"xscale",          "number",       10},                         -- increase/decrease scale along x (east-west) axis
@@ -62,7 +62,7 @@ local settings_table = {
     {"b01tprob1",       "number",       0},
     {"b01tree2",        "string",       ""},
     {"b01tprob2",       "number",       0},
-    {"b01shrub1",       "string",       "flowers:dandelion_white"},
+    {"b01shrub1",       "string",       "default:marram_grass_1"},
     {"b01sprob1",       "number",       2},
     {"b01shrub2",       "string",       "flowers:tulip_black"},
     {"b01sprob2",       "number",       20},
@@ -250,7 +250,7 @@ local settings_table = {
     {"b15sprob2",       "number",       0},
     
     -- #FFFFFF (white) cobblestone road
-    {"b16ground1",      "string",       "default:mossycobble"},
+    {"b16ground1",      "string",       "default:cobblestone"},
     {"b16ground2",      "string",       "default:dirt_with_grass"},
     {"b16gprob",        "number",       1},
     {"b16tree1",        "string",       ""},
