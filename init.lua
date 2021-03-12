@@ -61,7 +61,7 @@ function realterrain.init()
                     raster.bits = realterrain.settings[rastername.."bits"]
                     raster.format = "bmp"
                 else
-                    print("your file should be an uncompressed bmp")
+                    print("Your file should be an uncompressed bmp.")
                 end
                 print("["..rastername.."] file: "..realterrain.settings["file"..rastername].." width: "..raster.width..", length: "..raster.length)
             end
@@ -106,19 +106,19 @@ minetest.register_on_joinplayer(function(player)
     privs.teleport = true
     privs.worldedit = true
     minetest.set_player_privs(pname, privs)
-    minetest.chat_send_player(pname, "you have been granted some privs, like fast, fly, noclip, time, teleport and worldedit")
-    local ppos = player:getpos()
+    minetest.chat_send_player(pname, "You have been granted some privs, like fast, fly, noclip, time, teleport and worldedit.")
+    local ppos = player:get_pos()
     
-    local surface = realterrain.get_surface(0, 0)
-    local pos = {x=0, y=surface+0.5, z=0}
-    if not isnewplayer then
-        surface = realterrain.get_surface(math.floor(ppos.x+0.5), math.floor(ppos.z+0.5))
-        if surface then
-            pos = {x=ppos.x, y=surface+0.5, z=ppos.z}
-        end
-    end
-    player:setpos(pos)
-    minetest.chat_send_player(pname, "you have been moved to the surface")
+    --local surface = realterrain.get_surface(math.floor(ppos.x+0.5), math.floor(ppos.z+0.5))
+    --local pos = {x=0, y=surface+0.5, z=0}
+    --if not isnewplayer then
+        --surface = realterrain.get_surface(math.floor(ppos.x+0.5), math.floor(ppos.z+0.5))
+        --if surface then
+            --pos = {x=ppos.x, y=surface+0.5, z=ppos.z}
+        --end
+    --end
+    --player:setpos(pos)
+    --minetest.chat_send_player(pname, "You have been moved to the surface")
     return true
 end)
 
