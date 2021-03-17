@@ -55,6 +55,11 @@ Biomes are defined in settings.lua and are represented by one of 17 values betwe
 Information about DEM files can be found on the repo this was forked from.
 
 Changelog
+
+0.2
+- Added Minetest Game 5.4.0 biomes to the schems folder, moved old ones to old_schems folder
+- Set up new biomes to work
+
 0.1
 - Changed settings.lua and init.lua to remove errors
 - Added two maps of my own
