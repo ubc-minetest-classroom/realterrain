@@ -8,15 +8,15 @@ local settings_table = {
 
     -- default settings
     {"fileelev",        "string",       "dem.bmp"},   -- raster image file describing elevation (must be .bmp)
-    {"filecover",       "string",       "biome.bmp"},    -- raster image file describing biomes (must be .bmp)
+    {"filecover",       "string",       "biomes.bmp"},    -- raster image file describing biomes (must be .bmp)
     
-    {"yscale",          "number",       0.5},                         -- increase/decrease scale along y (vertical) axis
-    {"xscale",          "number",       10},                         -- increase/decrease scale along x (east-west) axis
-    {"zscale",          "number",       10},                         -- increase/decrease scale along z (north-south) axis
-    {"yoffset",         "number",       -10},                         -- increase/decrease offset along y (vertical) axis
+    {"yscale",          "number",       1},                         -- increase/decrease scale along y (vertical) axis
+    {"xscale",          "number",       1},                         -- increase/decrease scale along x (east-west) axis
+    {"zscale",          "number",       1},                         -- increase/decrease scale along z (north-south) axis
+    {"yoffset",         "number",       -16},                         -- increase/decrease offset along y (vertical) axis
     {"xoffset",         "number",       0},                         -- increase/decrease offset along x (east-west) axis (i.e. 886)
     {"zoffset",         "number",       0},                         -- increase/decrease offset along z (north-south) axis (i.e. -997)
-    {"centermap",       "boolean",      false},                      -- boolean, if true xoffset/zoffset will be set to half of raster width/height
+    {"centermap",       "boolean",      true},                      -- boolean, if true xoffset/zoffset will be set to half of raster width/height
 
     -- realterrain generated map settings
     {"alpinelevel",     "number",       100},                       -- height of alpine biome start (i.e. 150)
@@ -71,8 +71,8 @@ local settings_table = {
     {"b02ground1",      "string",       "default:dirt_with_grass"},
     {"b02ground2",      "string",       ""},
     {"b02gprob",        "number",       0},
-    {"b02tree1",        "string",       "aspen"},
-    {"b02tprob1",       "number",       .05},
+    {"b02tree1",        "string",       "bush"},
+    {"b02tprob1",       "number",       .5},
     {"b02tree2",        "string",       ""},
     {"b02tprob2",       "number",       0},
     {"b02shrub1",       "string",       "flowers:dandelion_white"},
@@ -84,9 +84,9 @@ local settings_table = {
     {"b03ground1",      "string",       "default:dirt_with_grass"},
     {"b03ground2",      "string",       ""},
     {"b03gprob",        "number",       0},
-    {"b03tree1",        "string",       "bush"},
+    {"b03tree1",        "string",       "pine_bush"},
     {"b03tprob1",       "number",       .5},
-    {"b03tree2",        "string",       "big_wpine"},
+    {"b03tree2",        "string",       "blueberry_bush"},
     {"b03tprob2",       "number",       15},
     {"b03shrub1",       "string",       "flowers:dandelion_white"},
     {"b03sprob1",       "number",       5},
@@ -94,12 +94,12 @@ local settings_table = {
     {"b03sprob2",       "number",       20},
 
     -- #404040 (gray4) deciduous forest (new)
-    {"b04ground1",      "string",       "default:dirt_with_coniferous_litter"},
-    {"b04ground2",      "string",       "default:dirt_with_grass"},
+    {"b04ground1",      "string",       "default:dirt_with_grass"},
+    {"b04ground2",      "string",       ""},
     {"b04gprob",        "number",       20},
     {"b04tree1",        "string",       "apple"},
     {"b04tprob1",       "number",       5},
-    {"b04tree2",        "string",       "aspen"},
+    {"b04tree2",        "string",       "aspen_tree"},
     {"b04tprob2",       "number",       30},
     {"b04shrub1",       "string",       "flowers:dandelion_white"},
     {"b04sprob1",       "number",       5},
@@ -110,7 +110,7 @@ local settings_table = {
     {"b05ground1",      "string",       "default:dirt_with_coniferous_litter"},
     {"b05ground2",      "string",       "default:dirt_with_grass"},
     {"b05gprob",        "number",       3},
-    {"b05tree1",        "string",       "gtree"},
+    {"b05tree1",        "string",       "apple"},
     {"b05tprob1",       "number",       6},
     {"b05tree2",        "string",       "bush"},
     {"b05tprob2",       "number",       20},
@@ -121,11 +121,11 @@ local settings_table = {
 
     -- #606060 (gray6) coniferous forest (new)
     {"b06ground1",      "string",       "default:dirt_with_coniferous_litter"},
-    {"b06ground2",      "string",       "default:dirt_with_grass"},
+    {"b06ground2",      "string",       ""},
     {"b06gprob",        "number",       5},
-    {"b06tree1",        "string",       "pine"},
+    {"b06tree1",        "string",       "pine_tree"},
     {"b06tprob1",       "number",       6},
-    {"b06tree2",        "string",       "pbush"},
+    {"b06tree2",        "string",       "pine_bush"},
     {"b06tprob2",       "number",       5},
     {"b06shrub1",       "string",       "flowers:viola"},
     {"b06sprob1",       "number",       5},
@@ -136,9 +136,9 @@ local settings_table = {
     {"b07ground1",      "string",       "default:dirt_with_coniferous_litter"},
     {"b07ground2",      "string",       "default:dirt_with_grass"},
     {"b07gprob",        "number",       5},
-    {"b07tree1",        "string",       "gpine"},
+    {"b07tree1",        "string",       "pine_tree"},
     {"b07tprob1",       "number",       8},
-    {"b07tree2",        "string",       "big_jeffrey"},
+    {"b07tree2",        "string",       ""},
     {"b07tprob2",       "number",       20},
     {"b07shrub1",       "string",       "flowers:viola"},
     {"b07sprob1",       "number",       5},
@@ -149,11 +149,11 @@ local settings_table = {
     {"b08ground1",      "string",       "default:dirt_with_dry_grass"},
     {"b08ground2",      "string",       ""},
     {"b08gprob",        "number",       0},
-    {"b08tree1",        "string",       "acacia"},
+    {"b08tree1",        "string",       "acacia_tree"},
     {"b08tprob1",       "number",       .7},
     {"b08tree2",        "string",       ""},
     {"b08tprob2",       "number",       0},
-    {"b08shrub1",       "string",       ""},
+    {"b08shrub1",       "string",       "acacia_bush"},
     {"b08sprob1",       "number",       0},
     {"b08shrub2",       "string",       ""},
     {"b08sprob2",       "number",       0},
@@ -162,7 +162,7 @@ local settings_table = {
     {"b09ground1",      "string",       "default:desert_sand"},
     {"b09ground2",      "string",       ""},
     {"b09gprob",        "number",       0},
-    {"b09tree1",        "string",       "cactus"},
+    {"b09tree1",        "string",       "large_cactus"},
     {"b09tprob1",       "number",       .1},
     {"b09tree2",        "string",       ""},
     {"b09tprob2",       "number",       0},
@@ -175,7 +175,7 @@ local settings_table = {
     {"b10ground1",      "string",       "default:dirt_with_rainforest_litter"},
     {"b10ground2",      "string",       "default:water_source"},
     {"b10gprob",        "number",       35},
-    {"b10tree1",        "string",       "papyrus"},
+    {"b10tree1",        "string",       "papyrus_on_dirt"},
     {"b10tprob1",       "number",       10},
     {"b10tree2",        "string",       ""},
     {"b10tprob2",       "number",       0},
@@ -186,13 +186,13 @@ local settings_table = {
     
     -- #B0B0B0 (gray11) tropical rainforest
     {"b11ground1",      "string",       "default:dirt_with_rainforest_litter"},
-    {"b11ground2",      "string",       "default:water_source"},
+    {"b11ground2",      "string",       ""},
     {"b11gprob",        "number",       10},
-    {"b11tree1",        "string",       "jungletree"},
-    {"b11tprob1",       "number",       15},
-    {"b11tree2",        "string",       "big_jungle"},
-    {"b11tprob2",       "number",       5},
-    {"b11shrub1",       "string",       "flowers:viola"},
+    {"b11tree1",        "string",       "emergent_jungle_tree"},
+    {"b11tprob1",       "number",       5},
+    {"b11tree2",        "string",       "jungle_tree"},
+    {"b11tprob2",       "number",       2},
+    {"b11shrub1",       "string",       "default:junglegrass"},
     {"b11sprob1",       "number",       5},
     {"b11shrub2",       "string",       "flowers:dandelion_yellow"},
     {"b11sprob2",       "number",       20},
@@ -201,7 +201,7 @@ local settings_table = {
     {"b12ground1",      "string",       "default:dirt_with_snow"},
     {"b12ground2",      "string",       ""},
     {"b12gprob",        "number",       0},
-    {"b12tree1",        "string",       "spbush"},
+    {"b12tree1",        "string",       "snowy_pine_tree_from_sapling"},
     {"b12tprob1",       "number",       1},
     {"b12tree2",        "string",       ""},
     {"b12tprob2",       "number",       0},
@@ -227,9 +227,9 @@ local settings_table = {
     {"b14ground1",      "string",       "default:dirt_with_snow"},
     {"b14ground2",      "string",       "default:dirt_with_coniferous_litter"},
     {"b14gprob",        "number",       4},
-    {"b14tree1",        "string",       "spine"},
+    {"b14tree1",        "string",       "snowy_pine_tree_from_sapling"},
     {"b14tprob1",       "number",       4},
-    {"b14tree2",        "string",       "big_sspruce"},
+    {"b14tree2",        "string",       "snowy_small_pine_tree_from_sapling"},
     {"b14tprob2",       "number",       10},
     {"b14shrub1",       "string",       "flowers:viola"},
     {"b14sprob1",       "number",       0},
@@ -250,7 +250,7 @@ local settings_table = {
     {"b15sprob2",       "number",       0},
     
     -- #FFFFFF (white) cobblestone road
-    {"b16ground1",      "string",       "default:cobblestone"},
+    {"b16ground1",      "string",       "default:cobble"},
     {"b16ground2",      "string",       "default:dirt_with_grass"},
     {"b16gprob",        "number",       1},
     {"b16tree1",        "string",       ""},
@@ -292,7 +292,7 @@ local settings_table = {
     {"b19ground1",      "string",       "default:dirt_with_snow"},
     {"b19ground2",      "string",       ""},
     {"b19gprob",        "number",       0},
-    {"b19tree1",        "string",       "spine2"},
+    {"b19tree1",        "string",       "snowy_pine_tree_from_sapling"},
     {"b19tprob1",       "number",       2},
     {"b19tree2",        "string",       ""},
     {"b19tprob2",       "number",       0},
