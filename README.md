@@ -45,7 +45,7 @@ Biomes are defined in settings.lua and are represented by one of 17 values betwe
 | 208       | #D0D0D0   | Tundra
 | 224       | #E0E0E0   | Boreal Forest / Tiaga
 | 240       | #F0F0F0   | River / Stream
-| 255       | #FFFFFF   | Mossy Cobblestone Road
+| 255       | #FFFFFF   | Cobblestone Road
 | 256       | N/A       | Ocean
 | 257       | N/A       | Alpine
 | 258       | N/A       | Sub-alpine
