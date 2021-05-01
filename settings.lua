@@ -412,7 +412,7 @@ realterrain.shafts = {
     { "default:permafrost_with_stones",         "default:permafrost",       "default:stone",        "snow",         30,     0,      0 },
     { "default:snowblock",                      "default:permafrost",       "default:stone",        "snowblock",    100,    0,      0 },
     { "default:ice",                            "default:ice",              "default:stone",        "snow",         30,     0,      0 },
-    { "default:mossycobble",                    "default:gravel",           "default:stone",        "grass",        10,     0,      0 },
+    { "default:cobble",                         "default:gravel",           "default:stone",        "grass",        10,     0,      0 },
 }
 
 -- used to divide the 8-bit biomes raster input of 256 values into 17 threshhold numbers plus 3 hard-coded slots(256-258) 
