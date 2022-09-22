@@ -23,7 +23,7 @@ local bug_max_height    = realterrain.settings.bugmaxheight
 local no_decoration     = realterrain.settings.nodecoration
 local no_biomes         = realterrain.settings.nobiomes
 local generate_ores     = realterrain.settings.generateores
-local trees             = realterrain.trees
+-- local trees             = realterrain.trees
 
 -- defaults for biome generation
 local stone             = nil
@@ -66,7 +66,7 @@ local function build_cids()
     table.insert(cids_bugs, minetest.get_content_id("butterflies:butterfly_white"))
     --table.insert(cids_bugs, minetest.get_content_id("butterflies:butterfly_violet"))
     --table.insert(cids_bugs, minetest.get_content_id("butterflies:butterfly_red"))
-    table.insert(cids_bugs, minetest.get_content_id("fireflies:firefly"))
+    -- table.insert(cids_bugs, minetest.get_content_id("fireflies:firefly"))
     for _ in pairs(cids_bugs) do cids_bugs_ct = cids_bugs_ct + 1 end
     -- cids_mushrooms
     table.insert(cids_mushrooms, minetest.get_content_id("flowers:mushroom_brown"))
@@ -321,190 +321,125 @@ local function get_tree(pos, name)
 end
 
 function realterrain.generate(minp, maxp)
+    -- Get the realm
+    local loadRealm = realterrain.loadRealm
+
     -------------------------------------
     -- this section creates the heightmap
     -------------------------------------
     local t0 = os.clock()
-    local x1 = maxp.x
-    local y1 = maxp.y
-    local z1 = maxp.z
 
-    local x0 = minp.x
-    local y0 = minp.y
-    local z0 = minp.z
-    
+    local c_stone = minetest.get_content_id("default:stone")
+    local c_dirt = minetest.get_content_id("default:dirt")
+    local c_dirt_with_grass = minetest.get_content_id("default:dirt_with_grass")
+    local c_dirt_with_coniferous_litter = minetest.get_content_id("default:dirt_with_coniferous_litter")
+    local c_pine_tree_needles = minetest.get_content_id("default:pine_needles")
+    local c_pine_tree = minetest.get_content_id("default:pine_tree")
+    local c_water_source = minetest.get_content_id("default:water_source")
+    local c_sand = minetest.get_content_id("default:sand")
+    local c_stonebrick = minetest.get_content_id("default:stonebrick")
+    local c_gravel = minetest.get_content_id("default:gravel")
+    local c_surface = c_dirt_with_grass -- Surface content
+    local filler_depth = 5 -- Nodes below the surface to fill with the filler, after which becomes bedrock
+    local sea_level = 0 -- Nodes above realm.StartPos.y to fill with water
+    local sand_level = 0 -- Nodes above sea_level to use sand as surface
+    local leaf_litter_below_canopy = true -- Boolean to replace c_surface_content with leaf litter under CHM (requires CHM)
+
+    -- Check if the chunk is within the realm
+    if (maxp.x < loadRealm.StartPos.x) and (maxp.z < loadRealm.StartPos.z) and (minp.x > loadRealm.EndPos.x) and (minp.z > loadRealm.EndPos.z) then
+        -- Chunk is not in the realm, skip
+        return 
+    end
+
+    -- Chunk is in the realm, continue processing
     local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
     local area = VoxelArea:new { MinEdge = emin, MaxEdge = emax }
     local data = vm:get_data()
-    local data2 = vm:get_param2_data()
-    local sidelen = x1 - x0 + 1
-    local ystridevm = area.ystride
 
-    --calculate the chunk coordinates
-    local cx0 = math.ceil(x0 / sidelen)
-    local cy0 = math.ceil(y0 / sidelen)
-    local cz0 = math.ceil(z0 / sidelen)
-    
-    --check to see if the current chunk is above (or below) the elevation range for this footprint
-    if surface_cache[cz0] and surface_cache[cz0][cx0] then
-        if surface_cache[cz0][cx0].offelev then
-            local chugent = math.ceil((os.clock() - t0) * 1000)
-            return
-        end
-        if y0 >= surface_cache[cz0][cx0].maxelev then
-            local chugent = math.ceil((os.clock() - t0) * 1000)
-            vm:set_data(data)
-            vm:calc_lighting()
-            vm:write_to_map(data)
-            vm:update_liquids()
-            return
-        end
-    end
-    
-    local buffer = 0
-    local heightmap = realterrain.build_heightmap(x0-buffer, x1+buffer, z0-buffer, z1+buffer) --build the heightmap
-    local minelev, maxelev --calculate the min and max elevations for skipping certain blocks completely
-    for z=z0, z1 do
-        for x=x0, x1 do
-            local elev
-            if heightmap[z] and heightmap[z][x] then
-                elev = heightmap[z][x].elev
-                if elev then
-                    if not minelev then
-                        minelev = elev
-                        maxelev = elev
-                    else
-                        if elev < minelev then
-                            minelev = elev
-                        end
-                        if elev > maxelev then
-                            maxelev = elev
+    for z = minp.z, maxp.z do
+        for y = minp.y, maxp.y do
+            for x = minp.x, maxp.x do
+                local vi = area:index(x, y, z)
+                local xx = math.floor(x-loadRealm.StartPos.x+0.5)
+                local nrow = loadRealm.EndPos.z-loadRealm.StartPos.z
+                local zz = math.floor(z-loadRealm.StartPos.z+0.5)
+                zz = nrow - zz -- We need to make this correction so that the map is oriented correctly
+                local dem_elev = realterrain.get_raw_pixel(xx, -zz, "dem")
+                local chm_elev = realterrain.get_raw_pixel(xx, -zz, "chm")
+                local urban_elev = realterrain.get_raw_pixel(xx, -zz, "urban")
+                local cover = realterrain.get_raw_pixel(xx, -zz, "cover")
+                -- Confirm we are on the [x,z] plane of the DEM
+                if dem_elev then
+                    -- Add the elevation to the realm coordinate space
+                    dem_elev = dem_elev + loadRealm.StartPos.y
+                    -- Check that the y of the chunk is within the realm
+                    if (y > loadRealm.StartPos.y) and (y < loadRealm.EndPos.y) then
+                        -- At or below sea_level
+                        if y <= loadRealm.StartPos.y+sea_level then
+                            -- Submerged land (sand)
+                            if y <= dem_elev then
+                                data[vi] = c_sand
+                            -- Just water
+                            else
+                                data[vi] = c_water_source
+                            end
+                        -- Sandy areas near sea_level
+                        elseif (y <= loadRealm.StartPos.y+sea_level+sand_level) and (y <= dem_elev) then
+                            data[vi] = c_sand
+                        -- Filler below surface
+                        elseif (y < dem_elev) and (y >= dem_elev-filler_depth) then
+                            data[vi] = c_dirt
+                        -- Bedrock below filler
+                        elseif (y < dem_elev-filler_depth) then
+                            data[vi] = c_stone
+                        -- Surface
+                        elseif y == dem_elev then
+                            if leaf_litter_below_canopy and (chm_elev > 0) then
+                                data[vi] = c_dirt_with_coniferous_litter
+                            elseif cover > 0 then
+                                -- TODO: create a lookup table for the cover codes
+                                data[vi] = c_gravel
+                            else
+                                data[vi] = c_surface
+                            end
+                        -- Buildings
+                        elseif urban_elev then
+                            if (y > dem_elev) and (y <= urban_elev) and (urban_elev > 0) then
+                                data[vi] = c_stonebrick
+                            end
                         end
                     end
+
+                    -- Check if the height value is valid (i.e., vegetation is present)
+                    if chm_elev then
+                        -- Add the height to the realm coordinate space
+                        chm_elev = chm_elev + loadRealm.StartPos.y
+                        -- Here we dilate the CHM vertically (chm_elev-2) to fill some gaps and make the visualization more realistic
+                        if (y > loadRealm.StartPos.y) and (y >= chm_elev-2) and (y <= chm_elev) then
+                            data[vi] = c_pine_tree_needles
+                        end
+                    end
+
+                    -- Get any tree locations
+                    if realterrain.trees[xx+1] and realterrain.trees[xx+1][zz+1] then
+                        local tree_elev = realterrain.trees[xx+1][zz+1]
+                        -- Debug.log("tree_elev = "..tostring(tree_elev))
+                        if tree_elev > 0 then
+                            tree_elev = tree_elev + loadRealm.StartPos.y
+                            if (y < tree_elev-1) and (y > dem_elev) then
+                                data[vi] = c_pine_tree
+                            end
+                        end
+                    end
+                    dem_elev = nil
+                    chm_elev = nil
+                    tree_elev = nil
+                    urban_elev = nil
                 end
             end
         end
     end
 
-    -- if there were elevations in this footprint then add the min and max to the cache table if not already there
-    if minelev then
-        if not surface_cache[cz0] then
-            surface_cache[cz0] = {}
-        end
-        if not surface_cache[cz0][cx0] then
-            surface_cache[cz0][cx0] = {minelev = minelev, maxelev=maxelev}
-        end
-    else
-        --otherwise this chunk was off the DEM raster
-        if not surface_cache[cz0] then
-            surface_cache[cz0] = {}
-        end
-        if not surface_cache[cz0][cx0] then
-            surface_cache[cz0][cx0] = {offelev=true}
-        end
-        local chugent = math.ceil((os.clock() - t0) * 1000)
-        return
-    end
-    --print(dump(heightmap))
-    
-    -------------------------------------
-    -- this section generates the map
-    -------------------------------------
-    if cids_grass[1] == nil then
-        build_cids()
-    end
-    if biomes[1] == nil then
-        build_biomes()
-    end
-    if shafts[1] == nil then
-        build_shafts()
-    end
-    
-    for z = z0, z1 do
-        for x = x0, x1 do
-            if heightmap[z] and heightmap[z][x] and heightmap[z][x]["elev"] then
-                
-                local vi    = area:index(x, y0, z) -- voxelmanip index
-                local elev  = heightmap[z][x].elev -- elevation in from DEM
-                local cover = heightmap[z][x].cover -- cover in from BIOMES
-                local shaft = get_shaft(cover, elev)
-
-                for y = y0, y1 do
-
-                    local node = nil
-                    
-                    -- determine the node type for every node in the y column
-                    if y < elev-filler_depth then
-                        node = shaft.bedrock
-                    elseif y < elev then
-                        node = shaft.filler
-                    elseif y == elev then
-                        node = shaft.surface
-                    elseif y <= water_level then
-                        node = water
-                    elseif y > water_level then
-                        -- everything else is decoration (kelp and coral are surface nodes)
-                        if y == water_level+1 and shaft.waterlily then
-                            node = shaft.waterlily
-                        elseif y == elev+1 then
-                            if shaft.tree then
-                                table.insert(treemap, get_tree({x=x,y=y,z=z}, shaft.tree))
-                            else
-                                node = shaft.shrub
-                            end
-                        elseif y == elev+shaft.bug_ht and not shaft.tree then
-                            node = shaft.bug
-                            table.insert(bugmap, {pos = {x=x,y=y,z=z}})
-                        end
-                    end
-                    
-                    if node then
-                        data[vi] = node
-                        data2[vi] = shaft.param2
-                        node = nil
-                    end
-                    vi = vi + ystridevm
-                end --end y iteration
-                
-            end --end if pixel is in heightmap
-        end -- end for x
-    end -- end for z
-
-    -- set decorations in fillmap to air to avoid collisions with tree schems
-    for _, trunk in ipairs(fillmap) do
-        for i in area:iterp(trunk.pos1, trunk.pos2) do
-           data[i] = air
-        end
-    end
-
-
-    vm:set_data(data)
-    vm:set_param2_data(data2)
-
-    if generate_ores then
-        minetest.generate_ores(vm, minp, maxp)
-    end
-    
-    vm:calc_lighting()
-    vm:write_to_map(data)
-    vm:update_liquids()
-
-    -- sort trees based on foliage height (shortest first) then place all the trees
-    -- a.order > b.order results in ordering of 3,2,1,0 with items at the beginning of the list (high foliage) overwriting those at the end (low foliage)
-    table.sort(treemap, function(a,b) return a.order > b.order end)
-    for _, tree in ipairs(treemap) do
-        --minetest.place_schematic_on_vmanip(vm, {x=tree.pos.x-tree.radius,y=tree.pos.y,z=tree.pos.z-tree.radius}, SCHEMS_PATH..tree.name..".mts", tree.rotation, nil, false)
-        minetest.place_schematic({x=tree.pos.x-tree.radius,y=tree.pos.y,z=tree.pos.z-tree.radius}, SCHEMS_PATH..tree.name..".mts", tree.rotation, nil, false)
-    end
-    
-    -- set node_timer for all bugs in bugmap
-    for _, bug in ipairs(bugmap) do
-        minetest.get_node_timer(bug.pos):start(1)
-    end
-    
-    -- reset chunk specific cache between each chunk
-    fillmap = {}
-    treemap = {}
-    bugmap = {}
-    
+    vm:set_data(data)    
+    vm:write_to_map(true)
 end

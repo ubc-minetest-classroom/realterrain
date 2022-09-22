@@ -13,10 +13,10 @@ local settings_table = {
     {"yscale",          "number",       1},                         -- increase/decrease scale along y (vertical) axis
     {"xscale",          "number",       1},                         -- increase/decrease scale along x (east-west) axis
     {"zscale",          "number",       1},                         -- increase/decrease scale along z (north-south) axis
-    {"yoffset",         "number",       -16},                         -- increase/decrease offset along y (vertical) axis
+    {"yoffset",         "number",       0},                         -- increase/decrease offset along y (vertical) axis
     {"xoffset",         "number",       0},                         -- increase/decrease offset along x (east-west) axis (i.e. 886)
     {"zoffset",         "number",       0},                         -- increase/decrease offset along z (north-south) axis (i.e. -997)
-    {"centermap",       "boolean",      true},                      -- boolean, if true xoffset/zoffset will be set to half of raster width/height
+    {"centermap",       "boolean",      false},                      -- boolean, if true xoffset/zoffset will be set to half of raster width/height
 
     -- realterrain generated map settings
     {"alpinelevel",     "number",       100},                       -- height of alpine biome start (i.e. 150)
