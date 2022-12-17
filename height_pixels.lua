@@ -36,6 +36,8 @@ function realterrain.get_raw_pixel(x,z,rastername) -- "rastername" is a string
         raster = realterrain.urban
     elseif rastername == "cover" then
         raster = realterrain.cover
+    elseif rastername == "symbology" then
+        raster = realterrain.symbology
     end
 
     local colstart, rowstart = 0,0

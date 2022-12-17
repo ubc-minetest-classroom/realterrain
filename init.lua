@@ -37,11 +37,13 @@ realterrain.trees = {}
 realterrain.urban = {}
 realterrain.buildings = {}
 realterrain.cover = {}
+realterrain.symbology = {}
 
 -- load files and run
 dofile(MOD_PATH .. "/settings.lua")
 dofile(LIB_PATH .. "/iohelpers.lua")
 dofile(LIB_PATH .. "/imageloader.lua")
+dofile(LIB_PATH .. "/lua-imagesize-1.2/imagesize.lua")
 dofile(MOD_PATH .. "/height_pixels.lua")
 dofile(MOD_PATH .. "/mapgen.lua")
 
@@ -163,6 +165,27 @@ function realterrain.init(DEM_PATH)
                 end
             end
         end
+
+        -- Check for image representing colorbrewer symbology
+        local symbology_file = minetest.get_modpath("realterrain").."\\rasters\\symbology\\"..realterrain.queued_key..".bmp"
+        if realterrain.file_exists(symbology_file) then
+            Debug.log("[realterrain] Symbology file path is "..symbology_file)
+            local width, length, format = imagesize.imgsize(symbology_file)
+            Debug.log("[realterrain] Symbology has image dimensions "..width.." by "..length)
+            if width and length and format then
+                if string.sub(format, -3) == "bmp" or string.sub(format, -6) == "bitmap" then
+                    local bitmap, e = imageloader.load(symbology_file)
+                    if e then Debug.log(e) end
+                    realterrain.symbology.image = bitmap
+                    realterrain.symbology.width = width
+                    realterrain.symbology.length = length
+                    realterrain.symbology.format = "bmp"
+                else
+                    minetest.chat_send_all("[realterrain] Your symbology file should be an uncompressed bmp. Cannot initialize realterrain.")
+                    return
+                end
+            end
+        end
     end
 
 end
@@ -280,7 +303,7 @@ end)
 
 -- On generated function
 minetest.register_on_generated(function(minp, maxp, seed)
-    if realterrain.realmEmergeContinue then -- TODO: This is a temporary flag to stop realterrain generation
+    if realterrain.realmEmergeContinue then
         realterrain.generate(minp, maxp)
     end
 end)
@@ -289,9 +312,8 @@ end)
 -- modified from https://rubenwardy.com/minetest_modding_book/en/map/environment.html#loading-blocks
 minetest.register_chatcommand("generate", {
     params = "",
-    description = "generate the map",
+    description = "force generate the map",
     func = function ()
-
         local loadRealm = realterrain.loadRealm
         local pos1 = loadRealm.StartPos
         local pos2 = loadRealm.EndPos
@@ -313,7 +335,7 @@ minetest.register_chatcommand("generate", {
             local z_axis = math.abs(pos1.z) + math.abs(pos2.z)
             map_dimensions1 = "Map dimensions:(" .. pos1.x .. ", " .. pos1.y .. ", " .. pos1.z .. ") to (" .. pos2.x .. ", " .. pos2.y .. ", " .. pos2.z .. ")"
             map_dimensions2 = "Map has a volume of " .. x_axis * pos2.y * z_axis .. " nodes (" .. x_axis .. "*" .. pos2.y .. "*" .. z_axis .. ")"
-
+    
             minetest.emerge_area (pos1, pos2, function (pos, action, num_calls_remaining, context)
                 -- On first call, record number of blocks
                 if not context.total_blocks then
@@ -321,10 +343,10 @@ minetest.register_chatcommand("generate", {
                     context.loaded_blocks = 0
                     context.start_time = os.clock()
                 end
-
+    
                 -- Increment number of blocks loaded
                 context.loaded_blocks = context.loaded_blocks + 1
-
+    
                 -- Send progress message
                 if context.total_blocks == context.loaded_blocks then
                     local elapsed_time = os.clock()-context.start_time

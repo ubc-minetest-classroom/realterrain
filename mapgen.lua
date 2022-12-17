@@ -321,6 +321,15 @@ local function get_tree(pos, name)
 end
 
 function realterrain.generate(minp, maxp)
+
+    -- Check the symbology flag
+    if realterrain.symbology.flag then 
+        -- Check that the symbology layer is readable
+        if not realterrain.file_exists(minetest.get_modpath("realterrain").."\\rasters\\symbology\\"..realterrain.queued_key..".bmp") then
+            return false, "realterrain symbology layer not found or name of file is incorrectly specified. Check ~\\realterrain\\rasters\\symbology\\"
+        end
+    end
+
     -- Get the realm
     local loadRealm = realterrain.loadRealm
 
@@ -329,6 +338,7 @@ function realterrain.generate(minp, maxp)
     -------------------------------------
     local t0 = os.clock()
 
+    local cb_node = minetest.get_content_id("colorbrewer:"..realterrain.symbology.palette)
     local c_stone = minetest.get_content_id("default:stone")
     local c_dirt = minetest.get_content_id("default:dirt")
     local c_dirt_with_grass = minetest.get_content_id("default:dirt_with_grass")
@@ -355,6 +365,7 @@ function realterrain.generate(minp, maxp)
     local vm, emin, emax = minetest.get_mapgen_object("voxelmanip")
     local area = VoxelArea:new { MinEdge = emin, MaxEdge = emax }
     local data = vm:get_data()
+    local param2data = vm:get_param2_data()
 
     for z = minp.z, maxp.z do
         for y = minp.y, maxp.y do
@@ -368,6 +379,7 @@ function realterrain.generate(minp, maxp)
                 local chm_elev = realterrain.get_raw_pixel(xx, -zz, "chm")
                 local urban_elev = realterrain.get_raw_pixel(xx, -zz, "urban")
                 local cover = realterrain.get_raw_pixel(xx, -zz, "cover")
+                local sym = realterrain.get_raw_pixel(xx, -zz, "symbology")
                 -- Confirm we are on the [x,z] plane of the DEM
                 if dem_elev then
                     -- Add the elevation to the realm coordinate space
@@ -394,18 +406,30 @@ function realterrain.generate(minp, maxp)
                             data[vi] = c_stone
                         -- Surface
                         elseif y == dem_elev then
-                            if leaf_litter_below_canopy and (chm_elev > 0) then
+                            if realterrain.symbology.flag and realterrain.symbology.layer == "dem" then
+                                data[vi] = cb_node
+                                param2data[vi] = sym
+                            elseif leaf_litter_below_canopy and chm_elev and chm_elev > 0 then
                                 data[vi] = c_dirt_with_coniferous_litter
-                            elseif cover > 0 then
-                                -- TODO: create a lookup table for the cover codes
-                                data[vi] = c_gravel
+                            elseif cover and cover > 0 then
+                                if realterrain.symbology.flag and realterrain.symbology.layer == "cover" then
+                                    data[vi] = cb_node
+                                    param2data[vi] = sym
+                                else
+                                    data[vi] = c_gravel -- TODO: create a lookup table for the cover codes
+                                end
                             else
                                 data[vi] = c_surface
                             end
                         -- Buildings
                         elseif urban_elev then
                             if (y > dem_elev) and (y <= urban_elev) and (urban_elev > 0) then
-                                data[vi] = c_stonebrick
+                                if realterrain.symbology.flag and realterrain.symbology.layer == "urban" then
+                                    data[vi] = cb_node
+                                    param2data[vi] = sym
+                                else
+                                    data[vi] = c_stonebrick
+                                end
                             end
                         end
                     end
@@ -416,7 +440,12 @@ function realterrain.generate(minp, maxp)
                         chm_elev = chm_elev + loadRealm.StartPos.y
                         -- Here we dilate the CHM vertically (chm_elev-2) to fill some gaps and make the visualization more realistic
                         if (y > loadRealm.StartPos.y) and (y >= chm_elev-2) and (y <= chm_elev) then
-                            data[vi] = c_pine_tree_needles
+                            if realterrain.symbology.flag and realterrain.symbology.layer == "chm" then
+                                data[vi] = cb_node
+                                param2data[vi] = sym
+                            else
+                                data[vi] = c_pine_tree_needles
+                            end
                         end
                     end
 
@@ -440,6 +469,7 @@ function realterrain.generate(minp, maxp)
         end
     end
 
-    vm:set_data(data)    
+    vm:set_data(data)
+    if realterrain.symbology.flag then vm:set_param2_data(param2data) end
     vm:write_to_map(true)
 end
