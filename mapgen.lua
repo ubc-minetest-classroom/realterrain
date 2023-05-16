@@ -338,7 +338,7 @@ function realterrain.generate(minp, maxp)
     -------------------------------------
     local t0 = os.clock()
 
-    local cb_node = minetest.get_content_id("colorbrewer:"..realterrain.symbology.palette)
+    local cb_node = minetest.get_content_id("colorbrewer:"..(realterrain.symbology.palette or "Greens"))
     local c_stone = minetest.get_content_id("default:stone")
     local c_dirt = minetest.get_content_id("default:dirt")
     local c_dirt_with_grass = minetest.get_content_id("default:dirt_with_grass")
