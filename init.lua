@@ -12,7 +12,7 @@ local worldpath = minetest.get_worldpath()
 local modname = minetest.get_current_modname()
 local MOD_PATH = minetest.get_modpath(modname)
 local LIB_PATH = MOD_PATH .. "/lib/"
-local RASTER_PATH = MOD_PATH .. "/rasters/"
+local RASTER_PATH = minetest.get_modpath("mc_core").."/maps/raster_twins/"
 local SCHEMS_PATH = MOD_PATH .. "/schems/" -- used in mapgen.lua
 local IE = minetest.request_insecure_environment()
 package.path = (MOD_PATH.."/lib/lua-imagesize-1.2/?.lua;"..package.path)
@@ -77,7 +77,7 @@ function realterrain.init(DEM_PATH)
     if realterrain.dem.image then
         local dem_ras = realterrain.build_image(DEM_PATH..".bmp")
         -- Check for canopy height model (CHM) image
-        local chm_file = minetest.get_modpath("realterrain").."\\rasters\\chm\\"..realterrain.queued_key..".bmp"
+        local chm_file = RASTER_PATH.."chm\\"..realterrain.queued_key..".bmp"
         if realterrain.file_exists(chm_file) then
             Debug.log("[realterrain] CHM file path is "..chm_file)
             local width, length, format = imagesize.imgsize(chm_file)
@@ -115,7 +115,7 @@ function realterrain.init(DEM_PATH)
         end
 
         -- Check for urban image representing building elevations
-        local urban_file = minetest.get_modpath("realterrain").."\\rasters\\urban\\"..realterrain.queued_key..".bmp"
+        local urban_file = RASTER_PATH.."urban\\"..realterrain.queued_key..".bmp"
         if realterrain.file_exists(urban_file) then
             Debug.log("[realterrain] Urban file path is "..urban_file)
             local width, length, format = imagesize.imgsize(urban_file)
@@ -146,7 +146,7 @@ function realterrain.init(DEM_PATH)
         end
 
         -- Check for cover image representing cover types
-        local cover_file = minetest.get_modpath("realterrain").."\\rasters\\cover\\"..realterrain.queued_key..".bmp"
+        local cover_file = RASTER_PATH.."cover\\"..realterrain.queued_key..".bmp"
         if realterrain.file_exists(cover_file) then
             Debug.log("[realterrain] Cover file path is "..cover_file)
             local width, length, format = imagesize.imgsize(cover_file)
@@ -167,7 +167,7 @@ function realterrain.init(DEM_PATH)
         end
 
         -- Check for image representing colorbrewer symbology
-        local symbology_file = minetest.get_modpath("realterrain").."\\rasters\\symbology\\"..realterrain.queued_key..".bmp"
+        local symbology_file = RASTER_PATH.."symbology\\"..realterrain.queued_key..".bmp"
         if realterrain.file_exists(symbology_file) then
             Debug.log("[realterrain] Symbology file path is "..symbology_file)
             local width, length, format = imagesize.imgsize(symbology_file)
