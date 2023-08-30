@@ -325,8 +325,8 @@ function realterrain.generate(minp, maxp)
     -- Check the symbology flag
     if realterrain.symbology.flag then 
         -- Check that the symbology layer is readable
-        if not realterrain.file_exists(minetest.get_modpath("realterrain").."\\rasters\\symbology\\"..realterrain.queued_key..".bmp") then
-            return false, "realterrain symbology layer not found or name of file is incorrectly specified. Check ~\\realterrain\\rasters\\symbology\\"
+        if not realterrain.file_exists(realterrain.raster_path.."symbology\\"..realterrain.queued_key..".bmp") then
+            return false, "realterrain symbology layer not found or name of file is incorrectly specified. Check ~\\mc_core\\maps\\raster_twins\\symbology\\"
         end
     end
 
